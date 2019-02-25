@@ -430,7 +430,14 @@ function imgui.OnDrawFrame()
         imgui.Begin(u8'ТП меню', tporg, imgui.WindowFlags.AlwaysAutoResize)
 		if isCharInAnyCar(PLAYER_PED) then
 			if imgui.CollapsingHeader(u8'ТП (с авто)') then
-				if imgui.MenuItem(u8'Мэрия') then setCharCoordinates(PLAYER_PED, 1476, -1708, 14) tporg.v = false end
+				if imgui.MenuItem(u8'LS') then setCharCoordinates(PLAYER_PED, 1057, -1403, 13) tporg.v = false end
+				if imgui.MenuItem(u8'SF') then setCharCoordinates(PLAYER_PED, -1818, -579, 16) tporg.v = false end
+				if imgui.MenuItem(u8'LV') then setCharCoordinates(PLAYER_PED, 1797, 842, 10) tporg.v = false end
+				if imgui.MenuItem(u8'Мэрия LS') then setCharCoordinates(PLAYER_PED, 1476, -1708, 14) tporg.v = false end
+				if imgui.MenuItem(u8'VineVood') then setCharCoordinates(PLAYER_PED, 1373, -927, 34) tporg.v = false end
+				if imgui.MenuItem(u8'Мост ЛС - СФ') then setCharCoordinates(PLAYER_PED, 56, -1531, 5) tporg.v = false end
+				if imgui.MenuItem(u8'Мост ЛС - ЛВ') then setCharCoordinates(PLAYER_PED, 1698, -736, 50) tporg.v = false end
+				if imgui.MenuItem(u8'Мост СФ - ЛВ') then setCharCoordinates(PLAYER_PED, -1411, 814, 47) tporg.v = false end
 			end
 		end
 		if imgui.CollapsingHeader(u8'ТП в организации') then
