@@ -456,6 +456,7 @@ function imgui.OnDrawFrame()
 			if imgui.MenuItem(u8'LCN') then sampSendPickedUpPickup(183) tporg.v = false end
 			if imgui.MenuItem(u8'RM') then sampSendPickedUpPickup(184) tporg.v = false end
 			if imgui.MenuItem(u8'Yakuza') then sampSendPickedUpPickup(179) tporg.v = false end
+			if imgui.MenuItem(u8'Army SF (В инте нельзя)') then setCharCoordinates(PLAYER_PED, -1336, 477, 9) tporg.v = false end
 			if imgui.MenuItem(u8'Hitmans (В инте нельзя)') then setCharCoordinates(PLAYER_PED, -2240, 2351, 5) tporg.v = false end
 		end
 		if imgui.CollapsingHeader(u8'ТП из организации') then
@@ -480,12 +481,14 @@ function imgui.OnDrawFrame()
 			local positionX, positionY, positionZ = getCharCoordinates(PLAYER_PED)
 			if result then
 				imgui.Text(u8(string.format('Координаты метки: %d, %d, %d', posX, posY, posZ)))
+				imgui.Separator()
 				if imgui.MenuItem(u8'Телепортироваться по метке') then
 					local result, posX, posY, posZ = getTargetBlipCoordinatesFixed()
 					setCharCoordinates(PLAYER_PED, posX, posY, posZ)
 				end
 		 	else
 				imgui.Text(u8'Ошибка! Метка не стоит на карте') end
+				imgui.Separator()
 			imgui.Text(u8(string.format('Ваши координаты: %d, %d, %d', positionX, positionY, positionZ)))
 		end
 		imgui.End()
