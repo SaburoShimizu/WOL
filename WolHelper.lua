@@ -162,7 +162,7 @@ function main()
   sampRegisterChatCommand('wolreload', function() thisScript():reload() end)
   sampRegisterChatCommand('wolmenu', function() scriptmenu.v = true end)
   sampRegisterChatCommand('woltp', function() tporg.v = true end)
-  sampRegisterChatCommand('tpfind', function(res) sampSendChat('/find '..res) tpfindresult = true end)
+  sampRegisterChatCommand('tpfind', function(res) if #res > 0 then sampSendChat('/find '..res) tpfindresult = true end end)
 
   if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
 
