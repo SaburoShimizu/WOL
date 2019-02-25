@@ -37,7 +37,7 @@ u8 = encoding.UTF8
 
 
 script_name('Way_Of_Life_Helper')
-script_version('2.0.1')
+script_version('2.0.2')
 script_author('Saburo Shimizu')
 
 
@@ -74,6 +74,7 @@ dhelp = [[{FF7000}/wolgun - {d5dedd}Взять оружие с любого ме
 {FF7000}/wolreload - {d5dedd}Перезагрузка скрипта
 {FF7000}/wolmenu - {d5dedd}Меню скрипта
 {FF7000}/woltp - {d5dedd}Меню с телепортами
+{FF7000}/tpfind - {d5dedd}Телепорт к игроку
 
 
 {FF0000} Дополнительные настройки в INI файле]]
@@ -115,7 +116,7 @@ local ini = inicfg.load(default, 'Way_Of_Life_Helper.ini')
 wol = ini.WOL
 
 
-
+local tpfindresult = false
 local teg = '{FF0000}[WolHelper] {FFFFFF}'
 local sw, sh = getScreenResolution()
 local orgs = nil
@@ -148,9 +149,10 @@ function main()
   while not isSampAvailable() do wait(100) end
   local ip = sampGetCurrentServerAddress()
 
-  if ip:find('176.32.36.103') or ip:find('176.32.39.159') then activ = true sampAddChatMessage('{FF0000}AutoInvite {FFFFFF}для {00FF00}Way Of Life и After Life {01A0E9}загружен', - 1) sampAddChatMessage(teg ..'/wolhelp - команды скрипта. Версия скрипта: {d5dedd}' ..thisScript().version, - 1) sampAddChatMessage(teg ..'Если ваша статистика не была проверена автоматически введите {FF7000}/getstat', -1) if mvd then if script.find('MVDhelper Era') then script.find('MVDhelper Era'):unload() end end else thisScript():unload() end
+  if ip:find('176.32.36.103') or ip:find('176.32.39.159') then activ = true sampAddChatMessage('{FF0000}AutoInvite {FFFFFF}для {00FF00}Way Of Life и After Life {01A0E9}загружен', - 1) sampAddChatMessage(teg ..'/wolhelp - команды скрипта. Версия скрипта: {d5dedd}' ..thisScript().version, - 1) sampAddChatMessage(teg ..'Если ваша статистика не была проверена автоматически введите {FF7000}/getstat', -1) if wol.mvd then if script.find('MVDhelper Era') then script.find('MVDhelper Era'):unload() end end else thisScript():unload() end
 
   if aupd == true then apdeit() end
+  imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v
   imgui.Process = true
   sampRegisterChatCommand('swatgun', function(nambs) if #nambs ~= 0 and nambs ~= ' ' then naambs = nambs swatgun = true else sampAddChatMessage(teg ..'Вы введи неправильно команду. {FF7000}/swatgun [0-1]', -1) end end)
   sampRegisterChatCommand('wolgun', function() sampSendPickedUpPickup(getgunses[orgs]) end)
@@ -160,6 +162,7 @@ function main()
   sampRegisterChatCommand('wolreload', function() thisScript():reload() end)
   sampRegisterChatCommand('wolmenu', function() scriptmenu.v = true end)
   sampRegisterChatCommand('woltp', function() tporg.v = true end)
+  sampRegisterChatCommand('tpfind', function(res) sampSendChat('/find '..res) tpfindresult = true end)
 
   if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
 
@@ -468,7 +471,14 @@ function imgui.OnDrawFrame()
 		if imgui.CollapsingHeader(u8'ТП по метке') then
 			local result, posX, posY, posZ = getTargetBlipCoordinates()
 			local positionX, positionY, positionZ = getCharCoordinates(PLAYER_PED)
-			if result then if imgui.MenuItem(u8'Телепортироваться по метке') then setCharCoordinates(PLAYER_PED, posX, posY, posZ) end else imgui.Text(u8'Ошибка! Метка не стоит на карте') end
+			if result then
+				imgui.Text(u8(string.format('Координаты метки: %d, %d, %d', posX, posY, posZ)))
+				if imgui.MenuItem(u8'Телепортироваться по метке') then
+					local result, posX, posY, posZ = getTargetBlipCoordinatesFixed()
+					setCharCoordinates(PLAYER_PED, posX, posY, posZ)
+				end
+		 	else
+				imgui.Text(u8'Ошибка! Метка не стоит на карте') end
 			imgui.Text(u8(string.format('Ваши координаты: %d, %d, %d', positionX, positionY, positionZ)))
 		end
 		imgui.End()
@@ -477,28 +487,46 @@ function imgui.OnDrawFrame()
 		imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
         --imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
         imgui.Begin(u8'Меню пикапов', picupsimgui, imgui.WindowFlags.AlwaysAutoResize)
-		if imgui.MenuItem(u8'Смена скина') then sampSendPickedUpPickup(picups['Clotch']) tporg.v = false end
+		if imgui.MenuItem(u8'Смена скина') then sampSendPickedUpPickup(picups['Clotch']) picupsimgui.v = false end
 		if imgui.CollapsingHeader(u8'Автосалоны') then
-			if imgui.MenuItem(u8'Автосалон A класса (SF)') then sampSendPickedUpPickup(picups.avtosalon[1]) tporg.v = false end
-			if imgui.MenuItem(u8'Автосалон B класса (SF)') then sampSendPickedUpPickup(picups.avtosalon[2]) tporg.v = false end
-			if imgui.MenuItem(u8'Автосалон Nope класса (LS)') then sampSendPickedUpPickup(picups.avtosalon[3]) tporg.v = false end
+			if imgui.MenuItem(u8'Автосалон A класса (SF)') then sampSendPickedUpPickup(picups.avtosalon[1]) picupsimgui.v = false end
+			if imgui.MenuItem(u8'Автосалон B класса (SF)') then sampSendPickedUpPickup(picups.avtosalon[2]) picupsimgui.v = false end
+			if imgui.MenuItem(u8'Автосалон Nope класса (LS)') then sampSendPickedUpPickup(picups.avtosalon[3]) picupsimgui.v = false end
 		end
 		if imgui.CollapsingHeader(u8'Взять ган') then
-			if imgui.MenuItem(u8'LSPD') then sampSendPickedUpPickup(getgunses[1]) tporg.v = false end
-			if imgui.MenuItem(u8'FBI') then sampSendPickedUpPickup(getgunses[2]) tporg.v = false end
-			if imgui.MenuItem(u8'SWAT') then sampSendPickedUpPickup(getgunses[3]) tporg.v = false end
-			if imgui.MenuItem(u8'ВВС') then sampSendPickedUpPickup(getgunses[4]) tporg.v = false end
-			if imgui.MenuItem(u8'Army LV') then sampSendPickedUpPickup(getgunses[5]) tporg.v = false end
-			if imgui.MenuItem(u8'Army SF') then sampSendPickedUpPickup(getgunses[6]) tporg.v = false end
-			if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(getgunses[7]) tporg.v = false end
-			if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(getgunses[8]) tporg.v = false end
+			if imgui.MenuItem(u8'LSPD') then sampSendPickedUpPickup(getgunses[1]) picupsimgui.v = false end
+			if imgui.MenuItem(u8'FBI') then sampSendPickedUpPickup(getgunses[2]) picupsimgui.v = false end
+			if imgui.MenuItem(u8'SWAT') then sampSendPickedUpPickup(getgunses[3]) picupsimgui.v = false end
+			if imgui.MenuItem(u8'ВВС') then sampSendPickedUpPickup(getgunses[4]) picupsimgui.v = false end
+			if imgui.MenuItem(u8'Army LV') then sampSendPickedUpPickup(getgunses[5]) picupsimgui.v = false end
+			if imgui.MenuItem(u8'Army SF') then sampSendPickedUpPickup(getgunses[6]) picupsimgui.v = false end
+			if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(getgunses[7]) picupsimgui.v = false end
+			if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(getgunses[8]) picupsimgui.v = false end
 		end
 		imgui.End()
 	end
 end
 
 
-
+function SE.onSetCheckpoint(position, radius)
+    --if tpfindresult and position.z < 50 then print(string.format('X: %d, Y: %d, Z: %d', position.x, position.y, position.z)) end
+    if tpfindresult and position.z < 500 then
+        setCharCoordinates(PLAYER_PED, position.x, position.y, position.z)
+        print(string.format('X: %d, Y: %d, Z: %d', position.x, position.y, position.z))
+        tpfindresult = false
+    elseif tpfindresult and position.z > 500 then
+        sampAddChatMessage(teg ..'Возможно игрок находится в инте. Нажмите {FF7000}Y{FFFFFF} для продолжения или {FF7000}N{FFFFFF} для отклонения', - 1)
+        rkeys.registerHotKey({vkeys.VK_Y}, true, function() setCharCoordinates(PLAYER_PED, position.x, position.y, position.z)
+            print(string.format('X: %d, Y: %d, Z: %d', position.x, position.y, position.z))
+            rkeys.unRegisterHotKey({vkeys.VK_Y})
+        rkeys.unRegisterHotKey({vkeys.VK_N}) end)
+        rkeys.registerHotKey({vkeys.VK_N}, true, function()
+            sampAddChatMessage(teg ..'Отклонено', - 1)
+            rkeys.unRegisterHotKey({vkeys.VK_Y})
+        rkeys.unRegisterHotKey({vkeys.VK_N}) end)
+        tpfindresult = false
+    end
+end
 
 
 
@@ -654,6 +682,14 @@ function async_http_request(method, url, args, resolve, reject)
 	end)
 end
 
+
+
+function getTargetBlipCoordinatesFixed()
+    local bool, x, y, z = getTargetBlipCoordinates(); if not bool then return false end
+    requestCollision(x, y); loadScene(x, y, z)
+    local bool, x, y, z = getTargetBlipCoordinates()
+    return bool, x, y, z
+end
 
 
 function apply_custom_style()
