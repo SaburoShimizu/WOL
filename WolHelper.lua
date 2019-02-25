@@ -158,7 +158,7 @@ function main()
   sampRegisterChatCommand('wolgun', function() sampSendPickedUpPickup(getgunses[orgs]) end)
   sampRegisterChatCommand('getjob', function() sampSendPickedUpPickup(168) end)
   sampRegisterChatCommand('getstat', function() getstat = true sampSendChat('/mm') end)
-  sampRegisterChatCommand('wolhelp', function() sampShowDialog(132131, 'WOL Help', dhelp, 'Ok!', _, 0) end)
+  sampRegisterChatCommand('wolhelp', function() imguifaq.v = true end)
   sampRegisterChatCommand('wolreload', function() thisScript():reload() end)
   sampRegisterChatCommand('wolmenu', function() scriptmenu.v = true end)
   sampRegisterChatCommand('woltp', function() tporg.v = true end)
@@ -228,14 +228,11 @@ function getorg(orges)
   if orges:find('Правительство') then return 8 end
 end
 
-
-
 function SE.onServerMessage(color, text)
   if text:find('.+Вы успешно авторизовались!') then getstat = true sampSendChat('/mm') end
 end
 
 function SE.onShowDialog(dialogId, style, title, button1, button2, text)
-
   if wolalogin == true then
     if title == '{AEFFFF}Авторизация' then
       if text:find('.+Попыток: %d+ из %d+.+') then
@@ -537,8 +534,6 @@ function SE.onSetCheckpoint(position, radius)
         tpfindresult = false
     end
 end
-
-
 
 
 
