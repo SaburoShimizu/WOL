@@ -398,6 +398,8 @@ function imgui.OnDrawFrame()
                 end
                 if imgui.MenuItem(u8'Принудительно обновиться') then
                     updates()
+					scriptmenu.v = false
+					showCursor(false, false)
                 end
                 imgui.EndMenu()
             end
