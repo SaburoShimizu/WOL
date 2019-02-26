@@ -166,9 +166,9 @@ function main()
   sampRegisterChatCommand('wolreload', function() thisScript():reload() end)
   sampRegisterChatCommand('wolmenu', function() scriptmenu.v = true end)
   sampRegisterChatCommand('woltp', function() tporg.v = true end)
-  sampRegisterChatCommand('woldamag', function(id) sampSendGiveDamage(id, 49, 24, 9) end)
+  sampRegisterChatCommand('woldamag', function(id) 	if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else sampSendGiveDamage(id, 49, 24, 9) end end)
   sampRegisterChatCommand('wolsu', function(id) sampSendTakeDamage(id, 49, 24, 9) end)
-  sampRegisterChatCommand('woldamags', function(id) lua_thread.create(function() for i = 0, 3 do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end)
+  sampRegisterChatCommand('woldamags', function(id) 	if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else lua_thread.create(function() for i = 0, 3 do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
   sampRegisterChatCommand('woldamager', damagerblyt)
   sampRegisterChatCommand('wolpomeha', pomehaska)
   sampRegisterChatCommand('tpfind', function(res) if #res > 0 then sampSendChat('/find '..res) tpfindresult = true end end)
@@ -316,15 +316,13 @@ function damagerblyt()
 end
 
 function pomehaska(id)
+	if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return end
     if dmg ~= true then
         lua_thread.create(function()
             dmg = true
             sampAddChatMessage(teg ..'Убиватор включён', - 1)
 			local con = sampIsPlayerConnected(id)
-			local lastname = sampGetPlayerNickname(id)
-			local name = lastname
-            while dmg and con and name == lastname do
-				local name = sampGetPlayerNickname(id)
+            while dmg and con do
 				con = sampIsPlayerConnected(id)
                 sampSendGiveDamage(id, 49, 24, 9)
 				wait(0)
@@ -587,6 +585,7 @@ function SE.onSetCheckpoint(position, radius)
         tpfindresult = false
     end
 end
+
 
 
 
