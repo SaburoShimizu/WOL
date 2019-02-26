@@ -320,7 +320,8 @@ function pomehaska(id)
     if dmg ~= true then
         lua_thread.create(function()
             dmg = true
-            sampAddChatMessage(teg ..'Убиватор включён', - 1)
+			local name = sampGetPlayerNickname(id)
+            sampAddChatMessage(teg ..'Убиватор на ' ..name ..' включён', - 1)
 			local con = sampIsPlayerConnected(id)
             while dmg and con do
 				con = sampIsPlayerConnected(id)
@@ -332,7 +333,7 @@ function pomehaska(id)
         end)
     else
         dmg = false
-        sampAddChatMessage(teg ..'Убиватор выключен', - 1)
+        sampAddChatMessage(teg ..'Убиватор на ' ..name ..' выключен', - 1)
     end
 end
 
