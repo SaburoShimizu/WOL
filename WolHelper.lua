@@ -37,7 +37,7 @@ u8 = encoding.UTF8
 
 
 script_name('Way_Of_Life_Helper')
-script_version('2.0.2')
+script_version('2.0.5')
 script_author('Saburo Shimizu')
 
 
@@ -75,6 +75,10 @@ dhelp = [[{FF7000}/wolgun - {d5dedd}Взять оружие с любого ме
 {FF7000}/wolmenu - {d5dedd}Меню скрипта
 {FF7000}/woltp - {d5dedd}Меню с телепортами
 {FF7000}/tpfind - {d5dedd}Телепорт к игроку
+{FF7000}/woldamag - {d5dedd}Дамажит игрока
+{FF7000}/woldamags - {d5dedd}Убивает игрока
+{FF7000}/woldamager - {d5dedd}Убивает всех игроков в зоне стрима (1 раз)
+{FF7000}/wolpomeha - {d5dedd}По кд убивает игрока
 
 
 {FF0000} Дополнительные настройки в INI файле]]
@@ -162,6 +166,11 @@ function main()
   sampRegisterChatCommand('wolreload', function() thisScript():reload() end)
   sampRegisterChatCommand('wolmenu', function() scriptmenu.v = true end)
   sampRegisterChatCommand('woltp', function() tporg.v = true end)
+  sampRegisterChatCommand('woldamag', function(id) sampSendGiveDamage(id, 49, 24, 9) end)
+  sampRegisterChatCommand('wolsu', function(id) sampSendTakeDamage(id, 49, 24, 9) end)
+  sampRegisterChatCommand('woldamags', function(id) lua_thread.create(function() for i = 0, 3 do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end)
+  sampRegisterChatCommand('woldamager', damagerblyt)
+  sampRegisterChatCommand('wolpomeha', pomehaska)
   sampRegisterChatCommand('tpfind', function(res) if #res > 0 then sampSendChat('/find '..res) tpfindresult = true end end)
 
   if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
@@ -285,6 +294,50 @@ function SE.onShowDialog(dialogId, style, title, button1, button2, text)
     end
   end
 end
+
+
+
+function damagerblyt()
+    lua_thread.create(function()
+        local peds = getAllChars()
+        for i = 0, #peds do
+			local _, id = sampGetPlayerIdByCharHandle(peds[i])
+			local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
+			local result = sampIsPlayerPaused(id)
+			if not result and id ~= myid then
+				for z = 0, 3 do
+				sampSendGiveDamage(id, 49, 24, 9)
+				wait(90)
+				end
+				wait(200)
+			end
+        end
+    end)
+end
+
+function pomehaska(id)
+    if dmg ~= true then
+        lua_thread.create(function()
+            dmg = true
+            sampAddChatMessage(teg ..'Убиватор включён', - 1)
+			local con = sampIsPlayerConnected(id)
+			local lastname = sampGetPlayerNickname(id)
+			local name = lastname
+            while dmg and con and name == lastname do
+				local name = sampGetPlayerNickname(id)
+				con = sampIsPlayerConnected(id)
+                sampSendGiveDamage(id, 49, 24, 9)
+				wait(0)
+            end
+			dmg = false
+			if not con then sampAddChatMessage(teg ..'Убиватор выключен. Жертва оффнулась', -1) end
+        end)
+    else
+        dmg = false
+        sampAddChatMessage(teg ..'Убиватор выключен', - 1)
+    end
+end
+
 
 --ОБНОВА
 
