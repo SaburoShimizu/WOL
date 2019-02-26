@@ -168,7 +168,7 @@ function main()
   sampRegisterChatCommand('woltp', function() tporg.v = true end)
   sampRegisterChatCommand('woldamag', function(id) 	if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else sampSendGiveDamage(id, 49, 24, 9) end end)
   sampRegisterChatCommand('wolsu', function(id) sampSendTakeDamage(id, 49, 24, 9) end)
-  sampRegisterChatCommand('woldamags', function(id) 	if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else lua_thread.create(function() for i = 0, 3 do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
+  sampRegisterChatCommand('woldamags', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else lua_thread.create(function() for i = 0, 3 do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
   sampRegisterChatCommand('woldamager', damagerblyt)
   sampRegisterChatCommand('wolpomeha', pomehaska)
   sampRegisterChatCommand('tpfind', function(res) if #res > 0 then sampSendChat('/find '..res) tpfindresult = true end end)
@@ -317,10 +317,10 @@ end
 
 function pomehaska(id)
 	if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return end
+	local name = sampGetPlayerNickname(id)
     if dmg ~= true then
         lua_thread.create(function()
             dmg = true
-			local name = sampGetPlayerNickname(id)
             sampAddChatMessage(teg ..'Убиватор на ' ..name ..' включён', - 1)
 			local con = sampIsPlayerConnected(id)
             while dmg and con do
