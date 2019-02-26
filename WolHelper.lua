@@ -59,7 +59,8 @@ getgunses = {
   [5] = 57, -- Army LV
   [6] = 56, -- Army SF
   [7] = 218, -- Meria
-  [8] = 225 -- Pra-vo
+  [8] = 225, -- Pra-vo
+  [9] = hitmangun -- Hitmans
 }
 
 
@@ -159,7 +160,7 @@ function main()
   imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v
   imgui.Process = true
   sampRegisterChatCommand('swatgun', function(nambs) if #nambs ~= 0 and nambs ~= ' ' then naambs = nambs swatgun = true else sampAddChatMessage(teg ..'Вы введи неправильно команду. {FF7000}/swatgun [0-1]', -1) end end)
-  sampRegisterChatCommand('wolgun', function() sampSendPickedUpPickup(getgunses[orgs]) end)
+  sampRegisterChatCommand('wolgun', wolgun)
   sampRegisterChatCommand('getjob', function() sampSendPickedUpPickup(168) end)
   sampRegisterChatCommand('getstat', function() getstat = true sampSendChat('/mm') end)
   sampRegisterChatCommand('wolhelp', function() imguifaq.v = true end)
@@ -235,6 +236,7 @@ function getorg(orges)
   if orges:find('Army SF') then return 6 end
   if orges:find('Мэрия') then return 7 end
   if orges:find('Правительство') then return 8 end
+  if orges:find('Hitmans') then return 9 end
 end
 
 function SE.onServerMessage(color, text)
@@ -296,6 +298,10 @@ function SE.onShowDialog(dialogId, style, title, button1, button2, text)
 end
 
 
+
+function wolgun()
+     if orgs < 9 then sampSendPickedUpPickup(getgunses[orgs]) elseif orgs == 9 then hitmangun() end
+end
 
 function damagerblyt()
     lua_thread.create(function()
@@ -592,7 +598,16 @@ end
 
 
 
-
+function hitmangun()
+    lua_thread.create(function()
+        local positionX, positionY, positionZ = getCharCoordinates(PLAYER_PED)
+        setCharCoordinates(PLAYER_PED, - 2240, 2351, 5)
+        sampSendChat('/menu')
+        wait(25)
+        sampSendDialogResponse(5051, 1, 3, 7)
+        setCharCoordinates(PLAYER_PED, positionX, positionY, positionZ)
+    end)
+end
 
 
 
