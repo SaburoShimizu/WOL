@@ -186,6 +186,8 @@ function main()
 
   rkeys.registerHotKey({vkeys.VK_MENU, vkeys.VK_1}, true, function() if not superkillerubiza.v then superkillerubiza.v = true end end)
 
+  showCursor(false, false)
+
   while true do
     -- LOAD PARAMS
     wol = ini.WOL
