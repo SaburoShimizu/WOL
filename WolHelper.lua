@@ -312,7 +312,8 @@ end
 
 
 function wolgun()
-     if orgs < 9 then sampSendPickedUpPickup(getgunses[orgs]) elseif orgs == 9 then hitmangun() end
+    if orgs == nil then sampAddChatMessage(teg ..'Сначало используйте {FF7000}/getstat', - 1) return end
+    if orgs < 9 then sampSendPickedUpPickup(getgunses[orgs]) elseif orgs == 9 then hitmangun() end
 end
 
 function damagerblyt()
