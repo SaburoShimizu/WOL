@@ -143,7 +143,7 @@ local imguiaupd = imgui.ImBool(wol.aupd)
 local imguiaulog = imgui.ImBool(wol.wolalogin)
 local imguiautoinv = imgui.ImBool(wol.org)
 local imguipass = imgui.ImBuffer(256)
-local picupid = imgui.ImBuffer(256)
+local picupid = imgui.ImInt(0)
 local superkillerubizaid = imgui.ImInt(0)
 local superkillerubizarezhim = imgui.ImInt(0)
 imguipass.v = wol.wolpass
@@ -581,9 +581,9 @@ function imgui.OnDrawFrame()
                 if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(getgunses[8]) picupsimgui.v = false end
             end
             if imgui.CollapsingHeader(u8'Взять пикап по ID') then
-                imgui.InputText(u8'Введите ID пикапа', picupid)
+                imgui.InputInt(u8'Введите ID пикапа', picupid, 0, 9000)
                 imgui.Separator()
-                if imgui.MenuItem(u8'Взять пикап '..picupid.v) then if not picupid.v:find('%a+') then sampSendPickedUpPickup(u8:decode(picupid.v)) else sampAddChatMessage(teg ..'Введён не правильный ID', - 1) end end
+                if imgui.MenuItem(u8'Взять пикап '..picupid.v) then sampSendPickedUpPickup(picupid.v) else end
             end
             imgui.End()
         end
