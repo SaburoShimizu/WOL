@@ -174,13 +174,12 @@ function main()
   sampRegisterChatCommand('wolhelp', function() imguifaq.v = true end)
   sampRegisterChatCommand('wolreload', function() thisScript():reload() end)
   sampRegisterChatCommand('wolmenu', function() scriptmenu.v = true end)
-  sampRegisterChatCommand('woltp', function() tporg.v = true end)
+  sampRegisterChatCommand('woltp', function(res) if res:find('%d+') then sampSendChat('/find '..res) tpfindresult = true else tporg.v = true end end)
   sampRegisterChatCommand('woldamag', function(id) 	if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else sampSendGiveDamage(id, 49, 24, 9) end end)
   sampRegisterChatCommand('wolsu', function(id) sampSendTakeDamage(id, 49, 24, 9) end)
   sampRegisterChatCommand('woldamags', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else lua_thread.create(function() for i = 0, 4 do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
   sampRegisterChatCommand('woldamager', damagerblyt)
   sampRegisterChatCommand('wolpomeha', pomehaska)
-  sampRegisterChatCommand('tpfind', function(res) if #res > 0 then sampSendChat('/find '..res) tpfindresult = true end end)
 
   if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
 
