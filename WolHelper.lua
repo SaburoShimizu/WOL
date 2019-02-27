@@ -135,6 +135,7 @@ local scriptmenu = imgui.ImBool(false)
 local imguifaq = imgui.ImBool(false)
 local tporg = imgui.ImBool(false)
 local picupsimgui = imgui.ImBool(false)
+local superkillerubiza = imgui.ImBool(false)
 
 local imguiautogun = imgui.ImBool(wol.autogun)
 local imguimvd = imgui.ImBool(wol.mvd)
@@ -142,10 +143,17 @@ local imguiaupd = imgui.ImBool(wol.aupd)
 local imguiaulog = imgui.ImBool(wol.wolalogin)
 local imguiautoinv = imgui.ImBool(wol.org)
 local imguipass = imgui.ImBuffer(256)
+local picupid = imgui.ImBuffer(256)
+local superkillerubizaid = imgui.ImInt(0)
+local superkillerubizarezhim = imgui.ImInt(0)
 imguipass.v = wol.wolpass
 
 
-
+local killerrezhim = {
+	[0] = u8'Убить',
+	[1] = u8'Помеха',
+	[2] = u8'Урон (49)',
+}
 
 
 
@@ -169,12 +177,14 @@ function main()
   sampRegisterChatCommand('woltp', function() tporg.v = true end)
   sampRegisterChatCommand('woldamag', function(id) 	if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else sampSendGiveDamage(id, 49, 24, 9) end end)
   sampRegisterChatCommand('wolsu', function(id) sampSendTakeDamage(id, 49, 24, 9) end)
-  sampRegisterChatCommand('woldamags', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else lua_thread.create(function() for i = 0, 3 do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
+  sampRegisterChatCommand('woldamags', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else lua_thread.create(function() for i = 0, 4 do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
   sampRegisterChatCommand('woldamager', damagerblyt)
   sampRegisterChatCommand('wolpomeha', pomehaska)
   sampRegisterChatCommand('tpfind', function(res) if #res > 0 then sampSendChat('/find '..res) tpfindresult = true end end)
 
   if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
+
+  rkeys.registerHotKey({vkeys.VK_MENU, vkeys.VK_1}, true, function() if not superkillerubiza.v then superkillerubiza.v = true end end)
 
   while true do
     -- LOAD PARAMS
@@ -327,7 +337,7 @@ function pomehaska(id)
     if dmg ~= true then
         lua_thread.create(function()
             dmg = true
-            sampAddChatMessage(teg ..'Убиватор на ' ..name ..' включён', - 1)
+            sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] включён', - 1)
 			local con = sampIsPlayerConnected(id)
             while dmg and con do
 				con = sampIsPlayerConnected(id)
@@ -339,7 +349,7 @@ function pomehaska(id)
         end)
     else
         dmg = false
-        sampAddChatMessage(teg ..'Убиватор на ' ..name ..' выключен', - 1)
+        sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] выключен', - 1)
     end
 end
 
@@ -382,7 +392,7 @@ function updates()
 end
 
 function imgui.OnDrawFrame()
-	imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v
+    imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v
     if scriptmenu.v then
         imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
         imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
@@ -390,11 +400,11 @@ function imgui.OnDrawFrame()
         if imgui.BeginMenuBar() then
             if imgui.BeginMenu(u8'Меню скрипта') then
                 if imgui.MenuItem(u8'Перезагрузить') then
-					showCursor(false, false)
+                    showCursor(false, false)
                     thisScript():reload()
                 end
                 if imgui.MenuItem(u8'Выключить') then
-					showCursor(false, false)
+                    showCursor(false, false)
                     thisScript():unload()
                 end
                 imgui.EndMenu()
@@ -405,30 +415,30 @@ function imgui.OnDrawFrame()
                 end
                 if imgui.MenuItem(u8'Принудительно обновиться') then
                     updates()
-					scriptmenu.v = false
-					showCursor(false, false)
+                    scriptmenu.v = false
+                    showCursor(false, false)
                 end
                 imgui.EndMenu()
             end
             if imgui.BeginMenu(u8'Функции') then
                 if imgui.MenuItem(u8'ТП меню') then
                     tporg.v = true
-					scriptmenu.v = false
+                    scriptmenu.v = false
                 end
                 if imgui.MenuItem(u8'Меню пикапов') then
-					picupsimgui.v = true
-					scriptmenu.v = false
+                    picupsimgui.v = true
+                    scriptmenu.v = false
                 end
                 if imgui.MenuItem(u8'Взять оружие') then
-					if orgs ~= nil then sampSendPickedUpPickup(getgunses[orgs]) else sampAddChatMessage(teg ..'Организация не определена', -1) end
-					scriptmenu.v = false
+                    if orgs ~= nil then sampSendPickedUpPickup(getgunses[orgs]) else sampAddChatMessage(teg ..'Организация не определена', - 1) end
+                    scriptmenu.v = false
                 end
                 if imgui.MenuItem(u8'Трудоустройство') then
-					sampSendPickedUpPickup(168)
-					scriptmenu.v = false
+                    sampSendPickedUpPickup(168)
+                    scriptmenu.v = false
                 end
                 if imgui.MenuItem(u8'Проверка статистики') then
-					getstat = true sampSendChat('/mm')
+                    getstat = true sampSendChat('/mm')
                 end
                 imgui.EndMenu()
             end
@@ -440,36 +450,36 @@ function imgui.OnDrawFrame()
                 imgui.EndMenu()
             end
             imgui.EndMenuBar()
-			imgui.Text(u8'Автоматическое обновление')
-			imgui.SameLine(365)
-	        imadd.ToggleButton('ainv##6', imguiaupd)
-			wol.aupd = imguiaupd.v
-			imgui.Text(u8'Автоинвайт')
-			imgui.SameLine(365)
-	        imadd.ToggleButton('ainv##6', imguiautoinv)
-			wol.org = imguiautoinv.v
-			imgui.Text(u8'Автоган')
-			imgui.SameLine(365)
-	        imadd.ToggleButton('autogun##6', imguiautogun)
-			wol.autogun = imguiautogun.v
-			imgui.Text(u8'Выключать MVD helper')
-			imgui.SameLine(365)
-	        imadd.ToggleButton('mvd##6', imguimvd)
-			wol.mvd = imguimvd.v
-			imgui.Text(u8'Автологин')
-			imgui.SameLine(365)
-	        imadd.ToggleButton('alogin##6', imguiaulog)
-			wol.wolalogin = imguiaulog.v
-			if imguiaulog.v then
-				imgui.InputText(u8'Введите пароль', imguipass)
-				imgui.Text(u8'Текущий пароль: '..wol.wolpass)
-				wol.wolpass = u8:decode(imguipass.v)
-			end
-			imgui.Spacing()
-			imgui.Separator()
-			imgui.Spacing()
-			if imgui.MenuItem(u8'Сохранить настройки в INI') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Настройки сохранены', -1) end
-			if imgui.MenuItem(u8'Сбросить настройки INI') then inicfg.save(restore, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Настройки сброшены', -1) end
+            imgui.Text(u8'Автоматическое обновление')
+            imgui.SameLine(365)
+            imadd.ToggleButton('ainv##6', imguiaupd)
+            wol.aupd = imguiaupd.v
+            imgui.Text(u8'Автоинвайт')
+            imgui.SameLine(365)
+            imadd.ToggleButton('ainv##6', imguiautoinv)
+            wol.org = imguiautoinv.v
+            imgui.Text(u8'Автоган')
+            imgui.SameLine(365)
+            imadd.ToggleButton('autogun##6', imguiautogun)
+            wol.autogun = imguiautogun.v
+            imgui.Text(u8'Выключать MVD helper')
+            imgui.SameLine(365)
+            imadd.ToggleButton('mvd##6', imguimvd)
+            wol.mvd = imguimvd.v
+            imgui.Text(u8'Автологин')
+            imgui.SameLine(365)
+            imadd.ToggleButton('alogin##6', imguiaulog)
+            wol.wolalogin = imguiaulog.v
+            if imguiaulog.v then
+                imgui.InputText(u8'Введите пароль', imguipass)
+                imgui.Text(u8'Текущий пароль: '..wol.wolpass)
+                wol.wolpass = u8:decode(imguipass.v)
+            end
+            imgui.Spacing()
+            imgui.Separator()
+            imgui.Spacing()
+            if imgui.MenuItem(u8'Сохранить настройки в INI') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Настройки сохранены', - 1) end
+            if imgui.MenuItem(u8'Сбросить настройки INI') then inicfg.save(restore, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Настройки сброшены', - 1) end
         end
         imgui.End()
     end
@@ -478,105 +488,127 @@ function imgui.OnDrawFrame()
         imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
         imgui.Begin(u8'F.A.Q', imguifaq, imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoSavedSettings)
         imgui.CenterTextColoredRGB(dhelp)
-		if isKeyJustPressed(0x1B) or isKeyJustPressed(0x08) or isKeyJustPressed(0x0D) then imguifaq.v = false end
+        if isKeyJustPressed(0x1B) or isKeyJustPressed(0x08) or isKeyJustPressed(0x0D) then imguifaq.v = false end
         imgui.End()
     end
-	if tporg.v then
-		imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+    if tporg.v then
+        imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
         --imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
         imgui.Begin(u8'ТП меню', tporg, imgui.WindowFlags.AlwaysAutoResize)
-		if isCharInAnyCar(PLAYER_PED) then
-			if imgui.CollapsingHeader(u8'ТП (с авто)') then
-				if imgui.MenuItem(u8'LS') then setCharCoordinates(PLAYER_PED, 1057, -1403, 13) tporg.v = false end
-				if imgui.MenuItem(u8'SF') then setCharCoordinates(PLAYER_PED, -1818, -579, 16) tporg.v = false end
-				if imgui.MenuItem(u8'LV') then setCharCoordinates(PLAYER_PED, 1797, 842, 10) tporg.v = false end
-				if imgui.MenuItem(u8'Мэрия LS') then setCharCoordinates(PLAYER_PED, 1476, -1708, 14) tporg.v = false end
-				if imgui.MenuItem(u8'VineVood') then setCharCoordinates(PLAYER_PED, 1373, -927, 34) tporg.v = false end
-				if imgui.MenuItem(u8'Мост ЛС - СФ') then setCharCoordinates(PLAYER_PED, 56, -1531, 5) tporg.v = false end
-				if imgui.MenuItem(u8'Мост ЛС - ЛВ') then setCharCoordinates(PLAYER_PED, 1698, -736, 50) tporg.v = false end
-				if imgui.MenuItem(u8'Мост СФ - ЛВ') then setCharCoordinates(PLAYER_PED, -1411, 814, 47) tporg.v = false end
-			end
-		end
-		if imgui.CollapsingHeader(u8'ТП в организации') then
-			if imgui.MenuItem(u8'LSPD') then sampSendPickedUpPickup(103) tporg.v = false end
-			if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(198) tporg.v = false end
-			if imgui.MenuItem(u8'Мэрия (сзади)') then sampSendPickedUpPickup(200) tporg.v = false end
-			if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(212) tporg.v = false end
-			if imgui.MenuItem(u8'S.W.A.T') then sampSendPickedUpPickup(24) tporg.v = false end
-			if imgui.MenuItem(u8'FBI') then sampSendPickedUpPickup(181) tporg.v = false end
-			if imgui.MenuItem(u8'SFPD') then sampSendPickedUpPickup(112) tporg.v = false end
-			if imgui.MenuItem(u8'СВ (Склад)') then sampSendPickedUpPickup(223) tporg.v = false end
-			if imgui.MenuItem(u8'ВВС (Склад)') then sampSendPickedUpPickup(35) tporg.v = false end
-			if imgui.MenuItem(u8'ВВС (Штаб)') then sampSendPickedUpPickup(38) tporg.v = false end
-			if imgui.MenuItem(u8'ВВС (Казарма)') then sampSendPickedUpPickup(32) tporg.v = false end
-			if imgui.MenuItem(u8'LVPD') then sampSendPickedUpPickup(172) tporg.v = false end
-			if imgui.MenuItem(u8'LCN') then sampSendPickedUpPickup(183) tporg.v = false end
-			if imgui.MenuItem(u8'RM') then sampSendPickedUpPickup(184) tporg.v = false end
-			if imgui.MenuItem(u8'Yakuza') then sampSendPickedUpPickup(179) tporg.v = false end
-			if imgui.MenuItem(u8'Army SF (В инте нельзя)') then setCharCoordinates(PLAYER_PED, -1336, 477, 9) tporg.v = false end
-			if imgui.MenuItem(u8'Hitmans (В инте нельзя)') then setCharCoordinates(PLAYER_PED, -2240, 2351, 5) tporg.v = false end
-		end
-		if imgui.CollapsingHeader(u8'ТП из организации') then
-			if imgui.MenuItem(u8'LSPD') then sampSendPickedUpPickup(104) tporg.v = false end
-			if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(201) tporg.v = false end
-			if imgui.MenuItem(u8'Мэрия (сзади)') then sampSendPickedUpPickup(199) tporg.v = false end
-			if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(213) tporg.v = false end
-			if imgui.MenuItem(u8'S.W.A.T') then sampSendPickedUpPickup(25) tporg.v = false end
-			if imgui.MenuItem(u8'FBI') then sampSendPickedUpPickup(180) tporg.v = false end
-			if imgui.MenuItem(u8'SFPD') then sampSendPickedUpPickup(111) tporg.v = false end
-			if imgui.MenuItem(u8'СВ (Склад)') then sampSendPickedUpPickup(224) tporg.v = false end
-			if imgui.MenuItem(u8'ВВС (Склад)') then sampSendPickedUpPickup(36) tporg.v = false end
-			if imgui.MenuItem(u8'ВВС (Штаб)') then sampSendPickedUpPickup(39) tporg.v = false end
-			if imgui.MenuItem(u8'ВВС (Казарма)') then sampSendPickedUpPickup(33) tporg.v = false end
-			if imgui.MenuItem(u8'LVPD') then sampSendPickedUpPickup(173) tporg.v = false end
-			if imgui.MenuItem(u8'LCN') then sampSendPickedUpPickup(182) tporg.v = false end
-			if imgui.MenuItem(u8'RM') then sampSendPickedUpPickup(177) tporg.v = false end
-			if imgui.MenuItem(u8'Yakuza') then sampSendPickedUpPickup(178) tporg.v = false end
-		end
-		if imgui.CollapsingHeader(u8'ТП по метке') then
-			local result, posX, posY, posZ = getTargetBlipCoordinates()
-			local positionX, positionY, positionZ = getCharCoordinates(PLAYER_PED)
-			if result then
-				imgui.Text(u8(string.format('Координаты метки: %d, %d, %d', posX, posY, posZ)))
-				imgui.Separator()
-				if imgui.MenuItem(u8'Телепортироваться по метке') then
-					local result, posX, posY, posZ = getTargetBlipCoordinatesFixed()
-					setCharCoordinates(PLAYER_PED, posX, posY, posZ)
-				end
-		 	else
-				imgui.Text(u8'Ошибка! Метка не стоит на карте') end
-				imgui.Separator()
-			imgui.Text(u8(string.format('Ваши координаты: %d, %d, %d', positionX, positionY, positionZ)))
-		end
-		imgui.End()
-	end
-	if picupsimgui.v then
-		imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-        --imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
-        imgui.Begin(u8'Меню пикапов', picupsimgui, imgui.WindowFlags.AlwaysAutoResize)
-		if imgui.MenuItem(u8'Смена скина') then sampSendPickedUpPickup(picups['Clotch']) picupsimgui.v = false end
-		if imgui.CollapsingHeader(u8'Автосалоны') then
-			if imgui.MenuItem(u8'Автосалон A класса (SF)') then sampSendPickedUpPickup(picups.avtosalon[1]) picupsimgui.v = false end
-			if imgui.MenuItem(u8'Автосалон B класса (SF)') then sampSendPickedUpPickup(picups.avtosalon[2]) picupsimgui.v = false end
-			if imgui.MenuItem(u8'Автосалон Nope класса (LS)') then sampSendPickedUpPickup(picups.avtosalon[3]) picupsimgui.v = false end
-		end
-		if imgui.CollapsingHeader(u8'Взять ган') then
-			if imgui.MenuItem(u8'LSPD') then sampSendPickedUpPickup(getgunses[1]) picupsimgui.v = false end
-			if imgui.MenuItem(u8'FBI') then sampSendPickedUpPickup(getgunses[2]) picupsimgui.v = false end
-			if imgui.MenuItem(u8'SWAT') then sampSendPickedUpPickup(getgunses[3]) picupsimgui.v = false end
-			if imgui.MenuItem(u8'ВВС') then sampSendPickedUpPickup(getgunses[4]) picupsimgui.v = false end
-			if imgui.MenuItem(u8'Army LV') then sampSendPickedUpPickup(getgunses[5]) picupsimgui.v = false end
-			if imgui.MenuItem(u8'Army SF') then sampSendPickedUpPickup(getgunses[6]) picupsimgui.v = false end
-			if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(getgunses[7]) picupsimgui.v = false end
-			if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(getgunses[8]) picupsimgui.v = false end
-		end
-		imgui.End()
-	end
-end
+        if isCharInAnyCar(PLAYER_PED) then
+            if imgui.CollapsingHeader(u8'ТП (с авто)') then
+                if imgui.MenuItem(u8'LS') then setCharCoordinates(PLAYER_PED, 1057, - 1403, 13) tporg.v = false end
+                if imgui.MenuItem(u8'SF') then setCharCoordinates(PLAYER_PED, - 1818, - 579, 16) tporg.v = false end
+                if imgui.MenuItem(u8'LV') then setCharCoordinates(PLAYER_PED, 1797, 842, 10) tporg.v = false end
+                if imgui.MenuItem(u8'Мэрия LS') then setCharCoordinates(PLAYER_PED, 1476, - 1708, 14) tporg.v = false end
+                if imgui.MenuItem(u8'VineVood') then setCharCoordinates(PLAYER_PED, 1373, - 927, 34) tporg.v = false end
+                if imgui.MenuItem(u8'Мост ЛС - СФ') then setCharCoordinates(PLAYER_PED, 56, - 1531, 5) tporg.v = false end
+                if imgui.MenuItem(u8'Мост ЛС - ЛВ') then setCharCoordinates(PLAYER_PED, 1698, - 736, 50) tporg.v = false end
+                if imgui.MenuItem(u8'Мост СФ - ЛВ') then setCharCoordinates(PLAYER_PED, - 1411, 814, 47) tporg.v = false end
+            end
+        end
+        if imgui.CollapsingHeader(u8'ТП в организации') then
+            if imgui.MenuItem(u8'LSPD') then sampSendPickedUpPickup(103) tporg.v = false end
+            if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(198) tporg.v = false end
+            if imgui.MenuItem(u8'Мэрия (сзади)') then sampSendPickedUpPickup(200) tporg.v = false end
+            if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(212) tporg.v = false end
+            if imgui.MenuItem(u8'S.W.A.T') then sampSendPickedUpPickup(24) tporg.v = false end
+            if imgui.MenuItem(u8'FBI') then sampSendPickedUpPickup(181) tporg.v = false end
+            if imgui.MenuItem(u8'SFPD') then sampSendPickedUpPickup(112) tporg.v = false end
+            if imgui.MenuItem(u8'СВ (Склад)') then sampSendPickedUpPickup(223) tporg.v = false end
+            if imgui.MenuItem(u8'ВВС (Склад)') then sampSendPickedUpPickup(35) tporg.v = false end
+            if imgui.MenuItem(u8'ВВС (Штаб)') then sampSendPickedUpPickup(38) tporg.v = false end
+            if imgui.MenuItem(u8'ВВС (Казарма)') then sampSendPickedUpPickup(32) tporg.v = false end
+            if imgui.MenuItem(u8'LVPD') then sampSendPickedUpPickup(172) tporg.v = false end
+            if imgui.MenuItem(u8'LCN') then sampSendPickedUpPickup(183) tporg.v = false end
+            if imgui.MenuItem(u8'RM') then sampSendPickedUpPickup(184) tporg.v = false end
+            if imgui.MenuItem(u8'Yakuza') then sampSendPickedUpPickup(179) tporg.v = false end
+            if imgui.MenuItem(u8'Army SF (В инте нельзя)') then setCharCoordinates(PLAYER_PED, - 1336, 477, 9) tporg.v = false end
+            if imgui.MenuItem(u8'Hitmans (В инте нельзя)') then setCharCoordinates(PLAYER_PED, - 2240, 2351, 5) tporg.v = false end
+        end
+        if imgui.CollapsingHeader(u8'ТП из организации') then
+            if imgui.MenuItem(u8'LSPD') then sampSendPickedUpPickup(104) tporg.v = false end
+            if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(201) tporg.v = false end
+            if imgui.MenuItem(u8'Мэрия (сзади)') then sampSendPickedUpPickup(199) tporg.v = false end
+            if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(213) tporg.v = false end
+            if imgui.MenuItem(u8'S.W.A.T') then sampSendPickedUpPickup(25) tporg.v = false end
+            if imgui.MenuItem(u8'FBI') then sampSendPickedUpPickup(180) tporg.v = false end
+            if imgui.MenuItem(u8'SFPD') then sampSendPickedUpPickup(111) tporg.v = false end
+            if imgui.MenuItem(u8'СВ (Склад)') then sampSendPickedUpPickup(224) tporg.v = false end
+            if imgui.MenuItem(u8'ВВС (Склад)') then sampSendPickedUpPickup(36) tporg.v = false end
+            if imgui.MenuItem(u8'ВВС (Штаб)') then sampSendPickedUpPickup(39) tporg.v = false end
+            if imgui.MenuItem(u8'ВВС (Казарма)') then sampSendPickedUpPickup(33) tporg.v = false end
+            if imgui.MenuItem(u8'LVPD') then sampSendPickedUpPickup(173) tporg.v = false end
+            if imgui.MenuItem(u8'LCN') then sampSendPickedUpPickup(182) tporg.v = false end
+            if imgui.MenuItem(u8'RM') then sampSendPickedUpPickup(177) tporg.v = false end
+            if imgui.MenuItem(u8'Yakuza') then sampSendPickedUpPickup(178) tporg.v = false end
+        end
+        if imgui.CollapsingHeader(u8'ТП по метке') then
+            local result, posX, posY, posZ = getTargetBlipCoordinates()
+            local positionX, positionY, positionZ = getCharCoordinates(PLAYER_PED)
+            if result then
+                imgui.Text(u8(string.format('Координаты метки: %d, %d, %d', posX, posY, posZ)))
+                imgui.Separator()
+                if imgui.MenuItem(u8'Телепортироваться по метке') then
+                    local result, posX, posY, posZ = getTargetBlipCoordinatesFixed()
+                    setCharCoordinates(PLAYER_PED, posX, posY, posZ)
+                end
+            else
+                imgui.Text(u8'Ошибка! Метка не стоит на карте') end
+                imgui.Separator()
+                imgui.Text(u8(string.format('Ваши координаты: %d, %d, %d', positionX, positionY, positionZ)))
+            end
+            imgui.End()
+        end
+        if picupsimgui.v then
+            imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+            --imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
+            imgui.Begin(u8'Меню пикапов', picupsimgui, imgui.WindowFlags.AlwaysAutoResize)
+            if imgui.MenuItem(u8'Смена скина') then sampSendPickedUpPickup(picups['Clotch']) picupsimgui.v = false end
+            if imgui.CollapsingHeader(u8'Автосалоны') then
+                if imgui.MenuItem(u8'Автосалон A класса (SF)') then sampSendPickedUpPickup(picups.avtosalon[1]) picupsimgui.v = false end
+                if imgui.MenuItem(u8'Автосалон B класса (SF)') then sampSendPickedUpPickup(picups.avtosalon[2]) picupsimgui.v = false end
+                if imgui.MenuItem(u8'Автосалон Nope класса (LS)') then sampSendPickedUpPickup(picups.avtosalon[3]) picupsimgui.v = false end
+            end
+            if imgui.CollapsingHeader(u8'Взять ган') then
+                if imgui.MenuItem(u8'LSPD') then sampSendPickedUpPickup(getgunses[1]) picupsimgui.v = false end
+                if imgui.MenuItem(u8'FBI') then sampSendPickedUpPickup(getgunses[2]) picupsimgui.v = false end
+                if imgui.MenuItem(u8'SWAT') then sampSendPickedUpPickup(getgunses[3]) picupsimgui.v = false end
+                if imgui.MenuItem(u8'ВВС') then sampSendPickedUpPickup(getgunses[4]) picupsimgui.v = false end
+                if imgui.MenuItem(u8'Army LV') then sampSendPickedUpPickup(getgunses[5]) picupsimgui.v = false end
+                if imgui.MenuItem(u8'Army SF') then sampSendPickedUpPickup(getgunses[6]) picupsimgui.v = false end
+                if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(getgunses[7]) picupsimgui.v = false end
+                if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(getgunses[8]) picupsimgui.v = false end
+            end
+            if imgui.CollapsingHeader(u8'Взять пикап по ID') then
+                imgui.InputText(u8'Введите ID пикапа', picupid)
+                imgui.Separator()
+                if imgui.MenuItem(u8'Взять пикап '..picupid.v) then if not picupid.v:find('%a+') then sampSendPickedUpPickup(u8:decode(picupid.v)) else sampAddChatMessage(teg ..'Введён не правильный ID', - 1) end end
+            end
+            imgui.End()
+        end
+        if superkillerubiza.v then
+            imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+            imgui.Begin(u8'Убиватор', superkillerubiza, imgui.WindowFlags.AlwaysAutoResize)
+            imgui.Combo(u8'##ska', superkillerubizarezhim, killerrezhim)
+            imgui.Separator()
+            imgui.InputInt(u8'Введите ID жертвы', superkillerubizaid, 0, 1000)
+            imgui.Text(u8'Вы ввели: ' ..superkillerubizaid.v)
+            imgui.Separator()
+            if imgui.MenuItem(u8'Атаковать') then
+                if superkillerubizarezhim.v == 0 then
+                    lua_thread.create(function() for i = 0, 4 do sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) wait(90) end end)
+                end
+                if superkillerubizarezhim.v == 1 then pomehaska(tostring(superkillerubizaid.v)) end
+                if superkillerubizarezhim.v == 2 then sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) end
+            end
+            if imgui.MenuItem(u8'Отмена') then superkillerubiza.v = false end
+            imgui.End()
+        end
+    end
 
 
 function SE.onSetCheckpoint(position, radius)
-    --if tpfindresult and position.z < 50 then print(string.format('X: %d, Y: %d, Z: %d', position.x, position.y, position.z)) end
     if tpfindresult and position.z < 500 then
         setCharCoordinates(PLAYER_PED, position.x, position.y, position.z)
         print(string.format('X: %d, Y: %d, Z: %d', position.x, position.y, position.z))
