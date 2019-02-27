@@ -101,6 +101,7 @@ local default = {
     aupd = true;
     wolpass = 0;
     wolalogin = false;
+    damag = 4;
   }
 }
 
@@ -113,6 +114,7 @@ local restore = {
     aupd = true;
     wolpass = 0;
     wolalogin = false;
+    damag = 4;
   }
 }
 
@@ -144,6 +146,7 @@ local imguiaulog = imgui.ImBool(wol.wolalogin)
 local imguiautoinv = imgui.ImBool(wol.org)
 local imguipass = imgui.ImBuffer(256)
 local picupid = imgui.ImInt(0)
+local damagersuska = imgui.ImInt(wol.damag)
 local superkillerubizaid = imgui.ImInt(0)
 local superkillerubizarezhim = imgui.ImInt(0)
 imguipass.v = wol.wolpass
@@ -177,7 +180,7 @@ function main()
   sampRegisterChatCommand('woltp', function(res) if res:find('%d+') then sampSendChat('/find '..res) tpfindresult = true else tporg.v = true end end)
   sampRegisterChatCommand('woldamag', function(id) 	if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else sampSendGiveDamage(id, 49, 24, 9) end end)
   sampRegisterChatCommand('wolsu', function(id) sampSendTakeDamage(id, 49, 24, 9) end)
-  sampRegisterChatCommand('woldamags', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else lua_thread.create(function() for i = 0, 4 do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
+  sampRegisterChatCommand('woldamags', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
   sampRegisterChatCommand('woldamager', damagerblyt)
   sampRegisterChatCommand('wolpomeha', pomehaska)
 
@@ -477,6 +480,11 @@ function imgui.OnDrawFrame()
                 imgui.Text(u8'Текущий пароль: '..wol.wolpass)
                 wol.wolpass = u8:decode(imguipass.v)
             end
+			imgui.Spacing()
+			imgui.Separator()
+			imgui.Spacing()
+			imgui.SliderInt(u8'Кол-во отправлений урона', damagersuska, 1, 15)
+			wol.damag = damagersuska.v
             imgui.Spacing()
             imgui.Separator()
             imgui.Spacing()
@@ -599,7 +607,7 @@ function imgui.OnDrawFrame()
             imgui.Separator()
             if imgui.MenuItem(u8'Атаковать') then
                 if superkillerubizarezhim.v == 0 then
-                    lua_thread.create(function() for i = 0, 4 do sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) wait(90) end end)
+                    lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) wait(90) end end)
                 end
                 if superkillerubizarezhim.v == 1 then pomehaska(tostring(superkillerubizaid.v)) end
                 if superkillerubizarezhim.v == 2 then sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) end
