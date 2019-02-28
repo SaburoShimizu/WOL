@@ -623,7 +623,7 @@ function imgui.OnDrawFrame()
             imgui.Begin(u8'Убиватор', superkillerubiza, imgui.WindowFlags.AlwaysAutoResize)
             imgui.Combo(u8'##ska', superkillerubizarezhim, killerrezhim)
             imgui.Separator()
-            imgui.InputInt(u8'Введите ID жертвы', superkillerubizaid, 0, 0)
+            imgui.InputInt(u8'Введите ID жертвы', superkillerubizaid, 0, 1000)
             imgui.Text(u8'Вы ввели: ' ..superkillerubizaid.v)
             imgui.Separator()
             if imgui.MenuItem(u8'Атаковать') then
