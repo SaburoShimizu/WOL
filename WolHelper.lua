@@ -194,11 +194,13 @@ function main()
   if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
 
   rkeys.registerHotKey({vkeys.VK_MENU, vkeys.VK_1}, true, function() if not superkillerubiza.v then superkillerubiza.v = true end end)
+  rkeys.registerHotKey({vkeys.VK_RETURN}, true, function() if findimgui.v then findimgui.v = false end end)
 
   showCursor(false, false)
 
   while true do
-	  imgui.Process = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v
+	  --imgui.Process = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v
+	  imgui.Process = true
     -- LOAD PARAMS
     wol = ini.WOL
     aupd = wol.aupd
@@ -661,7 +663,6 @@ function imgui.OnDrawFrame()
 			imgui.NewLine()
 			imgui.Separator()
 			imgui.Text(u8'Всего игроков: '..findkolvo..'													')
-			if isKeyJustPressed(vkeys.VK_RETURN) then findimgui.v = false end
             imgui.End()
         end
     end
