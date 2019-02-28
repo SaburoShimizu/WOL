@@ -16,6 +16,9 @@ assert(errr, 'Library rKeys not found')
 local errr, vkeys = pcall(require, 'vkeys')
 assert(errr, 'Library vKeys not found')
 
+local errr, re = pcall(require, 're')  -- LPeg
+assert(errr, 'Library LPeg not found')
+
 local lanes = require('lanes').configure()
 local errr, encoding = pcall(require, 'encoding')
 assert(errr, 'Library Encoding not found')
@@ -37,7 +40,7 @@ u8 = encoding.UTF8
 
 
 script_name('Way_Of_Life_Helper')
-script_version('2.0.5')
+script_version('2.0.6')
 script_author('Saburo Shimizu')
 
 
@@ -129,7 +132,10 @@ local sw, sh = getScreenResolution()
 local orgs = nil
 local getstat = false
 local swatgun = false
-local naambs = 0
+local naambs = 1
+local findkolvo = 0
+local findshow = false
+local findshowtable = {}
 
 imgui.Process = false
 local btn_size = imgui.ImVec2(-0.1, 0)
@@ -138,6 +144,7 @@ local imguifaq = imgui.ImBool(false)
 local tporg = imgui.ImBool(false)
 local picupsimgui = imgui.ImBool(false)
 local superkillerubiza = imgui.ImBool(false)
+local findimgui = imgui.ImBool(false)
 
 local imguiautogun = imgui.ImBool(wol.autogun)
 local imguimvd = imgui.ImBool(wol.mvd)
@@ -169,8 +176,9 @@ function main()
 
   if aupd == true then apdeit() end
   --imgui.Process = true
-  sampRegisterChatCommand('swatgun', function(nambs) if #nambs ~= 0 and nambs ~= ' ' then naambs = nambs swatgun = true else sampAddChatMessage(teg ..'Вы введи неправильно команду. {FF7000}/swatgun [0-1]', -1) end end)
+  sampRegisterChatCommand('swatgun', function(nambs) if nambs == 1 or nambs == 0 then naambs = nambs else sampAddChatMessage(teg ..'Вы введи неправильно команду. {FF7000}/swatgun [0-1]', -1) end end)
   sampRegisterChatCommand('wolgun', wolgun)
+  sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
   sampRegisterChatCommand('getjob', function() sampSendPickedUpPickup(168) end)
   sampRegisterChatCommand('getstat', function() getstat = true sampSendChat('/mm') end)
   sampRegisterChatCommand('wolhelp', function() imguifaq.v = true end)
@@ -190,7 +198,7 @@ function main()
   showCursor(false, false)
 
   while true do
-	  imgui.Process = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v
+	  imgui.Process = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v
     -- LOAD PARAMS
     wol = ini.WOL
     aupd = wol.aupd
@@ -253,8 +261,18 @@ function getorg(orges)
   if orges:find('Hitmans') then return 9 end
 end
 
+
 function SE.onServerMessage(color, text)
   if text:find('.+Вы успешно авторизовались!') then getstat = true sampSendChat('/mm') end
+  if text:find('Выдано:   Дубинка') and swatgun then return false end
+  --if re.match(text, 's <- {.+} / . s') then sampAddChatMessage(text, -1) end
+  if text:find('Члены организации Online') then findshowtable = {} findshow = true return false end
+  if findshow and text:find('ранг') then local id, nick, rang = text:match('%[(%d+)%] (%a+_%a+) ранг: (.+) ') local name = nick ..' ['..id..']' findshowtable[name] = rang return false end
+  if text:find('Всего: %d+ человек') then
+	  findkolvo = text:find('Всего: (%d+) человек')
+	  findshow = false
+	  return false
+  end
 end
 
 function SE.onShowDialog(dialogId, style, title, button1, button2, text)
@@ -297,7 +315,7 @@ function SE.onShowDialog(dialogId, style, title, button1, button2, text)
   end
 
   if swatgun == true then
-    if title == 'Комплекты « SWAT » San Andreas' then for i = 0, gun * 4 do sampSendDialogResponse(dialogId, tonumber(naambs), -1, -1) end swatgun = false end
+    if title == 'Комплекты « SWAT » San Andreas' then for i = 0, gun * 4 do sampSendDialogResponse(dialogId, tonumber(naambs), -1, -1) end lua_thread.create(function() wait(1500) swatgun = false end) end
   end
 
   if autogun == true and title:find('Набор.+') and dialogId == 5051 then
@@ -315,7 +333,7 @@ end
 
 function wolgun()
     if orgs == nil then sampAddChatMessage(teg ..'Сначало используйте {FF7000}/getstat', - 1) return end
-    if orgs < 9 then sampSendPickedUpPickup(getgunses[orgs]) elseif orgs == 9 then hitmangun() end
+    if orgs < 9 and orgs ~= 3 then sampSendPickedUpPickup(getgunses[orgs]) elseif orgs == 9 then hitmangun() elseif orgs == 3 then swatgun = true sampSendPickedUpPickup(getgunses[orgs]) end
 end
 
 function damagerblyt()
@@ -397,7 +415,7 @@ function updates()
 end
 
 function imgui.OnDrawFrame()
-    imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v
+    imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v
     if scriptmenu.v then
         imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
         imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
@@ -480,11 +498,11 @@ function imgui.OnDrawFrame()
                 imgui.Text(u8'Текущий пароль: '..wol.wolpass)
                 wol.wolpass = u8:decode(imguipass.v)
             end
-			imgui.Spacing()
-			imgui.Separator()
-			imgui.Spacing()
-			imgui.SliderInt(u8'Кол-во отправлений урона', damagersuska, 1, 15)
-			wol.damag = damagersuska.v
+            imgui.Spacing()
+            imgui.Separator()
+            imgui.Spacing()
+            imgui.SliderInt(u8'Кол-во отправлений урона', damagersuska, 1, 15)
+            wol.damag = damagersuska.v
             imgui.Spacing()
             imgui.Separator()
             imgui.Spacing()
@@ -602,7 +620,13 @@ function imgui.OnDrawFrame()
             imgui.Begin(u8'Убиватор', superkillerubiza, imgui.WindowFlags.AlwaysAutoResize)
             imgui.Combo(u8'##ska', superkillerubizarezhim, killerrezhim)
             imgui.Separator()
-            imgui.InputInt(u8'Введите ID жертвы', superkillerubizaid, 0, 1000)
+            if imgui.InputInt(u8'Введите ID жертвы', superkillerubizaid, 0, 0, imgui.InputTextFlags.EnterReturnsTrue) then
+                if superkillerubizarezhim.v == 0 then
+                    lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) wait(90) end end)
+                end
+                if superkillerubizarezhim.v == 1 then pomehaska(tostring(superkillerubizaid.v)) end
+                if superkillerubizarezhim.v == 2 then sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) end
+            end
             imgui.Text(u8'Вы ввели: ' ..superkillerubizaid.v)
             imgui.Separator()
             if imgui.MenuItem(u8'Атаковать') then
@@ -613,6 +637,29 @@ function imgui.OnDrawFrame()
                 if superkillerubizarezhim.v == 2 then sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) end
             end
             if imgui.MenuItem(u8'Отмена') then superkillerubiza.v = false end
+            imgui.End()
+        end
+        if findimgui.v then
+            imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+			imgui.SetNextWindowSize(imgui.ImVec2(400, 250), imgui.Cond.FirstUseEver)
+            --imgui.Begin('Members', findimgui, imgui.WindowFlags.NoSavedSettings)
+            imgui.Begin('Members', findimgui, imgui.WindowFlags.AlwaysAutoResize)
+			imgui.Columns(2, _, false)
+			imgui.Text(u8'Ник')
+			imgui.SetColumnWidth(-1, 200)
+			imgui.NextColumn()
+			imgui.Text(u8'Ранг')
+			imgui.Separator()
+			imgui.NewLine()
+			imgui.NextColumn()
+            for k, v in pairs(findshowtable) do
+                --imgui.Text(u8('Ник: '..k)) imgui.NextColumn() imgui.Text(u8(' Ранг: ' ..v)) imgui.NextColumn() --imgui.Spacing() --imgui.Separator()
+                imgui.Text(u8(k)) imgui.NextColumn() imgui.Text(u8(v)) imgui.NextColumn() --imgui.Spacing() --imgui.Separator()
+			end
+			imgui.Columns(1)
+			imgui.NewLine()
+			imgui.Separator()
+			imgui.Text(u8'Всего игроков: '..findkolvo..'													')
             imgui.End()
         end
     end
@@ -650,6 +697,20 @@ function hitmangun()
         setCharCoordinates(PLAYER_PED, positionX, positionY, positionZ)
     end)
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
