@@ -176,7 +176,7 @@ function main()
 
   if aupd == true then apdeit() end
   --imgui.Process = true
-  sampRegisterChatCommand('swatgun', function(nambs) if nambs == 1 or nambs == 0 then naambs = nambs else sampAddChatMessage(teg ..'Вы введи неправильно команду. {FF7000}/swatgun [0-1]', -1) end end)
+  sampRegisterChatCommand('swatgun', function(nambs) if nambs == '1' or nambs == '0' then naambs = nambs else sampAddChatMessage(teg ..'Вы введи неправильно команду. {FF7000}/swatgun [0-1]', -1) end end)
   sampRegisterChatCommand('wolgun', wolgun)
   sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
   sampRegisterChatCommand('getjob', function() sampSendPickedUpPickup(168) end)
