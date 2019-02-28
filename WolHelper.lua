@@ -168,8 +168,7 @@ function main()
   if ip:find('176.32.36.103') or ip:find('176.32.39.159') then activ = true sampAddChatMessage('{FF0000}AutoInvite {FFFFFF}для {00FF00}Way Of Life и After Life {01A0E9}загружен', - 1) sampAddChatMessage(teg ..'/wolhelp - команды скрипта. Версия скрипта: {d5dedd}' ..thisScript().version, - 1) sampAddChatMessage(teg ..'Если ваша статистика не была проверена автоматически введите {FF7000}/getstat', -1) if wol.mvd then if script.find('MVDhelper Era') then script.find('MVDhelper Era'):unload() end end else thisScript():unload() end
 
   if aupd == true then apdeit() end
-  imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v
-  imgui.Process = true
+  --imgui.Process = true
   sampRegisterChatCommand('swatgun', function(nambs) if #nambs ~= 0 and nambs ~= ' ' then naambs = nambs swatgun = true else sampAddChatMessage(teg ..'Вы введи неправильно команду. {FF7000}/swatgun [0-1]', -1) end end)
   sampRegisterChatCommand('wolgun', wolgun)
   sampRegisterChatCommand('getjob', function() sampSendPickedUpPickup(168) end)
@@ -191,6 +190,7 @@ function main()
   showCursor(false, false)
 
   while true do
+	  imgui.Process = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v
     -- LOAD PARAMS
     wol = ini.WOL
     aupd = wol.aupd
