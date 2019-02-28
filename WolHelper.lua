@@ -77,14 +77,14 @@ dhelp = [[{FF7000}/wolgun - {d5dedd}Взять оружие с любого ме
 {FF7000}/wolhelp - {d5dedd}Помощь по скрипту
 {FF7000}/wolreload - {d5dedd}Перезагрузка скрипта
 {FF7000}/wolmenu - {d5dedd}Меню скрипта
-{FF7000}/woltp - {d5dedd}Меню с телепортами
-{FF7000}/tpfind - {d5dedd}Телепорт к игроку
+{FF7000}/woltp [+ id] - {d5dedd}Меню с телепортами. [ТП к игроку]
 {FF7000}/woldamag - {d5dedd}Дамажит игрока
 {FF7000}/woldamags - {d5dedd}Убивает игрока
-{FF7000}/woldamager - {d5dedd}Убивает всех игроков в зоне стрима (1 раз)
+{FF7000}/woldamager [+ id] - {d5dedd}Убивает всех игроков в зоне стрима. [Убивает всех кроме ID]
 {FF7000}/wolpomeha - {d5dedd}По кд убивает игрока
 
 
+{FF0000} В [ ] указаны необязательные параметры
 {FF0000} Дополнительные настройки в INI файле]]
 
 
@@ -336,14 +336,17 @@ function wolgun()
     if orgs < 9 and orgs ~= 3 then sampSendPickedUpPickup(getgunses[orgs]) elseif orgs == 9 then hitmangun() elseif orgs == 3 then swatgun = true sampSendPickedUpPickup(getgunses[orgs]) end
 end
 
-function damagerblyt()
+function damagerblyt(nid)
+	local nekill = nil
+	if nid:find('%d+') then nekill = tonumber(nid) end
     lua_thread.create(function()
         local peds = getAllChars()
         for i = 0, #peds do
 			local _, id = sampGetPlayerIdByCharHandle(peds[i])
 			local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
 			local result = sampIsPlayerPaused(id)
-			if not result and id ~= myid then
+			if nekill == nil then nekill = myid end
+			if not result and id ~= myid and id ~= nekill then
 				for z = 0, 3 do
 				sampSendGiveDamage(id, 49, 24, 9)
 				wait(90)
