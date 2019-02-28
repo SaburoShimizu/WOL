@@ -269,7 +269,7 @@ function SE.onServerMessage(color, text)
   if text:find('Члены организации Online') then findshowtable = {} findshow = true return false end
   if findshow and text:find('ранг') then local id, nick, rang = text:match('%[(%d+)%] (%a+_%a+) ранг: (.+) ') local name = nick ..' ['..id..']' findshowtable[name] = rang return false end
   if text:find('Всего: %d+ человек') then
-	  findkolvo = text:find('Всего: (%d+) человек')
+	  findkolvo = text:match('Всего: (%d+) человек')
 	  findshow = false
 	  return false
   end
@@ -660,6 +660,7 @@ function imgui.OnDrawFrame()
 			imgui.NewLine()
 			imgui.Separator()
 			imgui.Text(u8'Всего игроков: '..findkolvo..'													')
+			if isKeyJustPressed(vkeys.VK_RETURN) then findimgui.v = false end
             imgui.End()
         end
     end
