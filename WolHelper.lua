@@ -417,6 +417,10 @@ function updates()
     end)
 end
 
+
+
+
+
 function imgui.OnDrawFrame()
     imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v
     if scriptmenu.v then
