@@ -620,13 +620,7 @@ function imgui.OnDrawFrame()
             imgui.Begin(u8'Убиватор', superkillerubiza, imgui.WindowFlags.AlwaysAutoResize)
             imgui.Combo(u8'##ska', superkillerubizarezhim, killerrezhim)
             imgui.Separator()
-            if imgui.InputInt(u8'Введите ID жертвы', superkillerubizaid, 0, 0, imgui.InputTextFlags.EnterReturnsTrue) then
-                if superkillerubizarezhim.v == 0 then
-                    lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) wait(90) end end)
-                end
-                if superkillerubizarezhim.v == 1 then pomehaska(tostring(superkillerubizaid.v)) end
-                if superkillerubizarezhim.v == 2 then sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) end
-            end
+            imgui.InputInt(u8'Введите ID жертвы', superkillerubizaid, 0, 0)
             imgui.Text(u8'Вы ввели: ' ..superkillerubizaid.v)
             imgui.Separator()
             if imgui.MenuItem(u8'Атаковать') then
