@@ -194,7 +194,16 @@ function main()
   if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
 
   rkeys.registerHotKey({vkeys.VK_MENU, vkeys.VK_1}, true, function() if not superkillerubiza.v then superkillerubiza.v = true end end)
-  rkeys.registerHotKey({vkeys.VK_RETURN}, true, function() if findimgui.v then findimgui.v = false end end)
+  rkeys.registerHotKey({vkeys.VK_RETURN}, true, function()
+	  if findimgui.v then findimgui.v = false end
+	  if superkillerubiza.v then
+		  if superkillerubizarezhim.v == 0 then
+			  lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) wait(90) end end)
+		  end
+		  if superkillerubizarezhim.v == 1 then pomehaska(tostring(superkillerubizaid.v)) end
+		  if superkillerubizarezhim.v == 2 then sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) end
+	  end
+  end)
 
   showCursor(false, false)
 
@@ -317,7 +326,7 @@ function SE.onShowDialog(dialogId, style, title, button1, button2, text)
   end
 
   if swatgun == true then
-    if title == 'Комплекты « SWAT » San Andreas' then for i = 0, gun * 4 do sampSendDialogResponse(dialogId, tonumber(naambs), -1, -1) end lua_thread.create(function() wait(1500) swatgun = false end) end
+    if title == 'Комплекты « SWAT » San Andreas' then for i = 0, gun * 4 do sampSendDialogResponse(dialogId, tonumber(naambs), -1, -1) end lua_thread.create(function() wait(3000) swatgun = false end) end
   end
 
   if autogun == true and title:find('Набор.+') and dialogId == 5051 then
@@ -349,7 +358,7 @@ function damagerblyt(nid)
 			local result = sampIsPlayerPaused(id)
 			if nekill == nil then nekill = myid end
 			if not result and id ~= myid and id ~= nekill then
-				for z = 0, 3 do
+				for z = 0, wol.damag do
 				sampSendGiveDamage(id, 49, 24, 9)
 				wait(90)
 				end
