@@ -326,7 +326,7 @@ function SE.onShowDialog(dialogId, style, title, button1, button2, text)
   end
 
   if swatgun == true then
-    if title == 'Комплекты « SWAT » San Andreas' then for i = 0, gun * 4 do sampSendDialogResponse(dialogId, tonumber(naambs), -1, -1) end lua_thread.create(function() wait(3000) swatgun = false end) end
+    if title == 'Комплекты « SWAT » San Andreas' then for i = 0, gun * 4 do sampSendDialogResponse(dialogId, tonumber(naambs), -1, -1) end lua_thread.create(function() wait(10000) swatgun = false end) end
   end
 
   if autogun == true and title:find('Набор.+') and dialogId == 5051 then
@@ -369,12 +369,17 @@ function damagerblyt(nid)
 end
 
 function pomehaska(id)
-	if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return end
+	if not id:find('%d+') then
+		notf.addNotification('WolHelper\n\nОшибка. Используйте {FF7000}/wolpomeha ID', 5)
+		return
+	end
+		--sampAddChatMessage(teg ..'Не правильно введён ID', -1) return end
 	local name = sampGetPlayerNickname(id)
     if dmg ~= true then
         lua_thread.create(function()
             dmg = true
-            sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] включён', - 1)
+            --sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] включён', - 1)
+			notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] включён', 5)
 			local con = sampIsPlayerConnected(id)
             while dmg and con do
 				con = sampIsPlayerConnected(id)
@@ -382,11 +387,15 @@ function pomehaska(id)
 				wait(0)
             end
 			dmg = false
-			if not con then sampAddChatMessage(teg ..'Убиватор выключен. Жертва оффнулась', -1) end
+			if not con then
+				--sampAddChatMessage(teg ..'Убиватор выключен. Жертва оффнулась', -1)
+				notf.addNotification('WolHelper\n\nУбиватор выключен. Жертва оффнулась', 5)
+			end
         end)
     else
         dmg = false
-        sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] выключен', - 1)
+        --sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] выключен', - 1)
+		notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] выключен', 5)
     end
 end
 
