@@ -35,6 +35,9 @@ assert(errr, 'Library Pie Menu not found')
 local errr, notf = pcall(import, 'imgui_notf.lua')
 assert(errr, 'Library Imgui Notification not found')
 
+local idnotf = script.find('imgui_notf.lua')
+
+
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
 
@@ -81,7 +84,8 @@ dhelp = [[{FF7000}/wolgun - {d5dedd}Взять оружие с любого ме
 {FF7000}/woldamag - {d5dedd}Дамажит игрока
 {FF7000}/woldamags - {d5dedd}Убивает игрока
 {FF7000}/woldamager [+ id] - {d5dedd}Убивает всех игроков в зоне стрима. [Убивает всех кроме ID]
-{FF7000}/wolpomeha - {d5dedd}По кд убивает игрока
+{FF7000}/wolpomeha - {d5dedd}Постоянно убивает игрока + не даёт ему заспавниться
+{FF7000}/wolleader- {d5dedd}Открыть панель лидеров
 
 
 {FF0000} В [ ] указаны необязательные параметры
@@ -183,6 +187,7 @@ function main()
 
   if ip:find('176.32.36.103') or ip:find('176.32.39.159') then activ = true sampAddChatMessage('{FF0000}AutoInvite {FFFFFF}для {00FF00}Way Of Life и After Life {01A0E9}загружен', - 1) sampAddChatMessage(teg ..'/wolhelp - команды скрипта. Версия скрипта: {d5dedd}' ..thisScript().version, - 1) sampAddChatMessage(teg ..'Если ваша статистика не была проверена автоматически введите {FF7000}/getstat', -1) if wol.mvd then if script.find('MVDhelper Era') then script.find('MVDhelper Era'):unload() end end else thisScript():unload() end
 
+  if script.find('PrisonHelper.lua') then script.find('PrisonHelper.lua'):unload() end
   if aupd == true then apdeit() end
   if not doesDirectoryExist(getWorkingDirectory() ..'/WolHelper') then
 	  createDirectory(getWorkingDirectory() ..'/WolHelper')
@@ -213,6 +218,7 @@ function main()
   sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
 
   if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
+
 
   rkeys.registerHotKey({vkeys.VK_MENU, vkeys.VK_1}, true, function() if not superkillerubiza.v then superkillerubiza.v = true end end)
   rkeys.registerHotKey({vkeys.VK_RETURN}, true, function()
@@ -839,6 +845,32 @@ end
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function onScriptTerminate(script, quitGame)
+	if script == idnotf then
+		lua_thread.create(function() wait(10) notf = import 'imgui_notf.lua' notf.addNotification('WolHelper успешно загружен\n\nВерсия скрипта: '..thisScript().version, 5) end)
+	end
+end
 
 function inFileRead(read_patch)
 	for line in io.lines(getWorkingDirectory()..'/WolHelper/'..read_patch) do
