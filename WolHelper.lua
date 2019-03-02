@@ -40,7 +40,7 @@ u8 = encoding.UTF8
 
 
 script_name('Way_Of_Life_Helper')
-script_version('2.0.6')
+script_version('2.0.7')
 script_author('Saburo Shimizu')
 
 
@@ -145,6 +145,7 @@ local tporg = imgui.ImBool(false)
 local picupsimgui = imgui.ImBool(false)
 local superkillerubiza = imgui.ImBool(false)
 local findimgui = imgui.ImBool(false)
+local wolleader = imgui.ImBool(false)
 
 local imguiautogun = imgui.ImBool(wol.autogun)
 local imguimvd = imgui.ImBool(wol.mvd)
@@ -156,6 +157,7 @@ local picupid = imgui.ImInt(0)
 local damagersuska = imgui.ImInt(wol.damag)
 local superkillerubizaid = imgui.ImInt(0)
 local superkillerubizarezhim = imgui.ImInt(0)
+local wolleadermenu = imgui.ImInt(0)
 imguipass.v = wol.wolpass
 
 
@@ -163,6 +165,13 @@ local killerrezhim = {
 	[0] = u8'Убить',
 	[1] = u8'Помеха',
 	[2] = u8'Урон (49)',
+}
+
+local govmenu = {
+	[0] = u8'Начало собеседования',
+	[1] = u8'Напоминание о собеседовании (1)',
+	[2] = u8'Напоминание о собеседовании (2)',
+	[3] = u8'Конец собеседования',
 }
 
 
@@ -175,6 +184,17 @@ function main()
   if ip:find('176.32.36.103') or ip:find('176.32.39.159') then activ = true sampAddChatMessage('{FF0000}AutoInvite {FFFFFF}для {00FF00}Way Of Life и After Life {01A0E9}загружен', - 1) sampAddChatMessage(teg ..'/wolhelp - команды скрипта. Версия скрипта: {d5dedd}' ..thisScript().version, - 1) sampAddChatMessage(teg ..'Если ваша статистика не была проверена автоматически введите {FF7000}/getstat', -1) if wol.mvd then if script.find('MVDhelper Era') then script.find('MVDhelper Era'):unload() end end else thisScript():unload() end
 
   if aupd == true then apdeit() end
+  if not doesDirectoryExist(getWorkingDirectory() ..'/WolHelper') then
+	  createDirectory(getWorkingDirectory() ..'/WolHelper')
+	  local file = io.open(getWorkingDirectory() ..'/WolHelper/начало_собеса.txt', 'w+')
+	  file:close()
+	  local file = io.open(getWorkingDirectory() ..'/WolHelper/конец_собеса.txt', 'w+')
+	  file:close()
+	  local file = io.open(getWorkingDirectory() ..'/WolHelper/первая_напоминалка_собеса.txt', 'w+')
+	  file:close()
+	  local file = io.open(getWorkingDirectory() ..'/WolHelper/вторая_напоминалка_собеса.txt', 'w+')
+	  file:close()
+  end
   --imgui.Process = true
   sampRegisterChatCommand('swatgun', function(nambs) if nambs == '1' or nambs == '0' then naambs = nambs else sampAddChatMessage(teg ..'Вы введи неправильно команду. {FF7000}/swatgun [0-1]', -1) end end)
   sampRegisterChatCommand('wolgun', wolgun)
@@ -190,6 +210,7 @@ function main()
   sampRegisterChatCommand('woldamags', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
   sampRegisterChatCommand('woldamager', damagerblyt)
   sampRegisterChatCommand('wolpomeha', pomehaska)
+  sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
 
   if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
 
@@ -205,11 +226,12 @@ function main()
 	  end
   end)
 
+  imgui.Process = true
+
   showCursor(false, false)
 
   while true do
 	  --imgui.Process = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v
-	  imgui.Process = true
     -- LOAD PARAMS
     wol = ini.WOL
     aupd = wol.aupd
@@ -442,7 +464,7 @@ end
 
 
 function imgui.OnDrawFrame()
-    imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v
+    imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v or wolleader.v
     if scriptmenu.v then
         imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
         imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
@@ -683,6 +705,30 @@ function imgui.OnDrawFrame()
 			imgui.Text(u8'Всего игроков: '..findkolvo..'													')
             imgui.End()
         end
+		if wolleader.v then
+			imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+			imgui.Begin(u8'Панель лидера', wolleader, imgui.WindowFlags.AlwaysAutoResize)
+			imgui.Combo('##leader', wolleadermenu, govmenu)
+			imgui.Spacing()
+			imgui.Separator()
+			imgui.Spacing()
+			if imgui.MenuItem(u8'Активировать') then
+				if wolleadermenu.v == 0 then lua_thread.create(function() inFileRead('начало_собеса.txt') end) end --Начало
+				if wolleadermenu.v == 1 then lua_thread.create(function() inFileRead('первая_напоминалка_собеса.txt') end) end --Напоминалка 1
+				if wolleadermenu.v == 2 then lua_thread.create(function() inFileRead('вторая_напоминалка_собеса.txt') end) end --Напоминалка 2
+				if wolleadermenu.v == 3 then lua_thread.create(function() inFileRead('конец_собеса.txt') end) end --Конец
+			end
+			imgui.Spacing()
+			imgui.Separator()
+			imgui.Spacing()
+			if imgui.CollapsingHeader(u8'Просмотр отыгровки') then
+				if wolleadermenu.v == 0 then inFileReadProsmotr('начало_собеса.txt') end --Начало
+				if wolleadermenu.v == 1 then inFileReadProsmotr('первая_напоминалка_собеса.txt') end --Напоминалка 1
+				if wolleadermenu.v == 2 then inFileReadProsmotr('вторая_напоминалка_собеса.txt') end --Напоминалка 2
+				if wolleadermenu.v == 3 then inFileReadProsmotr('конец_собеса.txt') end --Конец
+			end
+			imgui.End()
+		end
     end
 
 
@@ -777,6 +823,35 @@ end
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function inFileRead(read_patch)
+	for line in io.lines(getWorkingDirectory()..'/WolHelper/'..read_patch) do
+		sampSendChat(line)
+		wait(1000)
+	end
+end
+
+function inFileReadProsmotr(read_patch)
+	for line in io.lines(getWorkingDirectory()..'/WolHelper/'..read_patch) do
+		imgui.Text(u8(line))
+	end
+end
 
 function ShowHelpMarker(text)
 	imgui.SameLine()
