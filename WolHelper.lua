@@ -66,7 +66,20 @@ getgunses = {
   [6] = 56, -- Army SF
   [7] = 218, -- Meria
   [8] = 225, -- Pra-vo
-  [9] = hitmangun -- Hitmans
+  [9] = hitmangun, -- Hitmans
+  [10] = Ballas, -- Hitmans
+  [11] = Vagos, -- Hitmans
+  [12] = Grove, -- Hitmans
+  [13] = Actec, -- Hitmans
+  [14] = Rifa, -- Hitmans
+}
+
+bandgun = {
+	[10] = {2002, -1121, 27}, --Ballas
+	[11] = {2784, -1611, 11}, -- Vagis
+	[12] = {2492, -1670, 13}, -- Grove
+	[13] = {1671, -2113, 14}, -- Aztec
+	[14] = {2186, -1807, 13}, -- Rifa
 }
 
 
@@ -298,6 +311,11 @@ function getorg(orges)
   if orges:find('Мэрия') then return 7 end
   if orges:find('Правительство') then return 8 end
   if orges:find('Hitmans') then return 9 end
+  if orges:find('Ballas Gang') then return 10 end
+  if orges:find('Vagos Gang') then return 11 end
+  if orges:find('Grove Street Gang') then return 12 end
+  if orges:find('Aztecas Gang') then return 13 end
+  if orges:find('Rifa Gang') then return 14 end
 end
 
 
@@ -372,7 +390,15 @@ end
 
 function wolgun()
     if orgs == nil then sampAddChatMessage(teg ..'Сначало используйте {FF7000}/getstat', - 1) return end
-    if orgs < 9 and orgs ~= 3 then sampSendPickedUpPickup(getgunses[orgs]) elseif orgs == 9 then hitmangun() elseif orgs == 3 then swatgun = true sampSendPickedUpPickup(getgunses[orgs]) end
+    if orgs < 9 and orgs ~= 3 then
+		sampSendPickedUpPickup(getgunses[orgs])
+	elseif orgs == 9 then
+		hitmangun()
+	elseif orgs == 3 then
+		swatgun = true sampSendPickedUpPickup(getgunses[orgs])
+	elseif orgs >= 10 then
+		ganggun(orgs)
+	end
 end
 
 function damagerblyt(nid)
@@ -626,6 +652,26 @@ function imgui.OnDrawFrame()
             if imgui.MenuItem(u8'RM') then sampSendPickedUpPickup(177) tporg.v = false end
             if imgui.MenuItem(u8'Yakuza') then sampSendPickedUpPickup(178) tporg.v = false end
         end
+		if imgui.CollapsingHeader(u8'ТП в банды') then
+			imgui.Text(u8'ТП в инту')
+			imgui.Separator()
+			imgui.Spacing()
+			if imgui.MenuItem(u8'Ballas') then sampSendPickedUpPickup(207) tporg.v = false end
+			if imgui.MenuItem(u8'Vagos') then sampSendPickedUpPickup(210) tporg.v = false end
+			if imgui.MenuItem(u8'Groove') then sampSendPickedUpPickup(217) tporg.v = false end
+			if imgui.MenuItem(u8'Aztecas') then sampSendPickedUpPickup(214) tporg.v = false end
+			if imgui.MenuItem(u8'Rifa') then sampSendPickedUpPickup(209) tporg.v = false end
+			imgui.Spacing()
+			imgui.Separator()
+			imgui.Text(u8'ТП из инты (на улицу)')
+			imgui.Separator()
+			imgui.Spacing()
+			if imgui.MenuItem(u8'Ballas') then sampSendPickedUpPickup(206) tporg.v = false end
+			if imgui.MenuItem(u8'Vagos') then sampSendPickedUpPickup(211) tporg.v = false end
+			if imgui.MenuItem(u8'Groove') then sampSendPickedUpPickup(216) tporg.v = false end
+			if imgui.MenuItem(u8'Aztecas') then sampSendPickedUpPickup(215) tporg.v = false end
+			if imgui.MenuItem(u8'Rifa') then sampSendPickedUpPickup(208) tporg.v = false end
+		end
         if imgui.CollapsingHeader(u8'ТП по метке') then
             local result, posX, posY, posZ = getTargetBlipCoordinates()
             local positionX, positionY, positionZ = getCharCoordinates(PLAYER_PED)
@@ -758,7 +804,26 @@ function SE.onSetCheckpoint(position, radius)
 end
 
 
-
+function ganggun(gang)
+	if gang == nil then sampAddChatMessage(teg ..'Сначало введите {FF7000}/getstat', -1) return end
+	lua_thread.create(function()
+        local positionX, positionY, positionZ = getCharCoordinates(PLAYER_PED)
+        setCharCoordinates(PLAYER_PED, bandgun[gang][1], bandgun[gang][2], bandgun[gang][3])
+        wait(50)
+		sampSendChat('/gmenu')
+        sampSendDialogResponse(5051, 1, 0, 7)
+        setCharCoordinates(PLAYER_PED, positionX, positionY, positionZ)
+		for i = 0, 20 do
+			sampSendDialogResponse(5051, 1, 4, 7)
+		end
+		for i = 0, 20 do
+			sampSendDialogResponse(5051, 1, 8, 7)
+		end
+		for i = 0, 20 do
+			sampSendDialogResponse(5051, 1, 9, 7)
+		end
+    end)
+end
 
 function hitmangun()
     lua_thread.create(function()
