@@ -55,6 +55,10 @@ picups = {
 		[2] = 91, -- Пикап магазина одежды
         [3] = 90, -- Пикап магазина одежды
     },
+	blackjob = {
+		[1] = 95, -- Автоугонщик
+		[2] = 95, -- Автоугонщик
+	},
 }
 
 getgunses = {
@@ -152,6 +156,8 @@ local swatgun = false
 local naambs = 1
 local findkolvo = 0
 local findshow = false
+local blockcarhp = false
+local carhpthread = nil
 local findshowtable = {}
 
 imgui.Process = false
@@ -228,6 +234,7 @@ function main()
   sampRegisterChatCommand('woldamags', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', -1) return else lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
   sampRegisterChatCommand('woldamager', damagerblyt)
   sampRegisterChatCommand('wolpomeha', pomehaska)
+  sampRegisterChatCommand('wolcarhp', wolcarhp)
   sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
 
   if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
@@ -694,6 +701,7 @@ function imgui.OnDrawFrame()
             --imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
             imgui.Begin(u8'Меню пикапов', picupsimgui, imgui.WindowFlags.AlwaysAutoResize)
             if imgui.MenuItem(u8'Смена скина') then sampSendPickedUpPickup(picups['Clotch']) picupsimgui.v = false end
+			if imgui.MenuItem(u8'Автоугонщик') then sampSendPickedUpPickup(95) picupsimgui.v = false end
             if imgui.CollapsingHeader(u8'Автосалоны') then
                 if imgui.MenuItem(u8'Автосалон A класса (SF)') then sampSendPickedUpPickup(picups.avtosalon[1]) picupsimgui.v = false end
                 if imgui.MenuItem(u8'Автосалон B класса (SF)') then sampSendPickedUpPickup(picups.avtosalon[2]) picupsimgui.v = false end
@@ -825,6 +833,25 @@ function ganggun(gang)
     end)
 end
 
+function wolcarhp(args)
+    if carhpthread ~= nil then notf.addNotification('Ошибка!\n\nНе прошло 2 секунды до предыдущей смены!') return end
+    carhpthread = lua_thread.create(function()
+        if args:find('^%d+') then
+        blockcarhp = true
+        setCarHealth(storeCarCharIsInNoSave(PLAYER_PED), args)
+        wait(1000)
+        blockcarhp = false
+		carhpthread = nil
+    else
+        blockcarhp = true
+        setCarHealth(storeCarCharIsInNoSave(PLAYER_PED), 1000)
+        wait(1000)
+        blockcarhp = false
+		carhpthread = nil
+    end
+end)
+end
+
 function hitmangun()
     lua_thread.create(function()
         local positionX, positionY, positionZ = getCharCoordinates(PLAYER_PED)
@@ -836,7 +863,9 @@ function hitmangun()
     end)
 end
 
-
+function SE.onSetVehicleHealth(vehicleId, health)
+	if blockcarhp then return false end
+end
 
 
 
