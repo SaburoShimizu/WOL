@@ -43,7 +43,7 @@ u8 = encoding.UTF8
 
 
 script_name('Way_Of_Life_Helper')
-script_version('2.0.7')
+script_version('2.0.9')
 script_author('Saburo Shimizu')
 
 
@@ -103,6 +103,8 @@ dhelp = [[{FF7000}/wolgun - {d5dedd}Взять оружие с любого ме
 {FF7000}/woldamager [+ id] - {d5dedd}Убивает всех игроков в зоне стрима. [Убивает всех кроме ID]
 {FF7000}/wolpomeha - {d5dedd}Постоянно убивает игрока + не даёт ему заспавниться
 {FF7000}/wolleader- {d5dedd}Открыть панель лидеров
+{FF7000}/wolcarhp- {d5dedd}Поменять транспорту хп (Если ничего не указать - восстановит)
+{FF7000}/wolarmor- {d5dedd}Добавить армор (Если 0, то снимет)
 
 
 {FF0000} В [ ] указаны необязательные параметры
@@ -235,6 +237,7 @@ function main()
   sampRegisterChatCommand('woldamager', damagerblyt)
   sampRegisterChatCommand('wolpomeha', pomehaska)
   sampRegisterChatCommand('wolcarhp', wolcarhp)
+  sampRegisterChatCommand('wolarmor', wolarmor)
   sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
 
   if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
@@ -426,12 +429,13 @@ function damagerblyt(nid)
 				wait(200)
 			end
         end
+		notf.addNotification('Дамагер выключен', 5, 2)
     end)
 end
 
 function pomehaska(id)
 	if not id:find('%d+') then
-		notf.addNotification('WolHelper\n\nОшибка. Используйте {FF7000}/wolpomeha ID', 5)
+		notf.addNotification('WolHelper\n\nОшибка. Используйте /wolpomeha ID', 5, 3)
 		return
 	end
 		--sampAddChatMessage(teg ..'Не правильно введён ID', -1) return end
@@ -440,7 +444,7 @@ function pomehaska(id)
         lua_thread.create(function()
             dmg = true
             --sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] включён', - 1)
-			notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] включён', 5)
+			notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] включён', 5, 1)
 			local con = sampIsPlayerConnected(id)
             while dmg and con do
 				con = sampIsPlayerConnected(id)
@@ -450,13 +454,13 @@ function pomehaska(id)
 			dmg = false
 			if not con then
 				--sampAddChatMessage(teg ..'Убиватор выключен. Жертва оффнулась', -1)
-				notf.addNotification('WolHelper\n\nУбиватор выключен. Жертва оффнулась', 5)
+				notf.addNotification('WolHelper\n\nУбиватор выключен. Жертва оффнулась', 5, 1)
 			end
         end)
     else
         dmg = false
         --sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] выключен', - 1)
-		notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] выключен', 5)
+		notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] выключен', 5, 1)
     end
 end
 
@@ -768,7 +772,9 @@ function imgui.OnDrawFrame()
 		if wolleader.v then
 			imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 			imgui.Begin(u8'Панель лидера', wolleader, imgui.WindowFlags.AlwaysAutoResize)
+			imgui.PushItemWidth(250)
 			imgui.Combo('##leader', wolleadermenu, govmenu)
+			imgui.PushItemWidth()
 			imgui.Spacing()
 			imgui.Separator()
 			imgui.Spacing()
@@ -811,6 +817,15 @@ function SE.onSetCheckpoint(position, radius)
     end
 end
 
+function wolarmor(arm)
+	if arm:find('%d+') then
+		if arm == '0' then arm = getCharArmour(PLAYER_PED) * -1 end
+		addArmourToChar(PLAYER_PED, arm)
+	else
+		addArmourToChar(PLAYER_PED, 100)
+	end
+end
+
 
 function ganggun(gang)
 	if gang == nil then sampAddChatMessage(teg ..'Сначало введите {FF7000}/getstat', -1) return end
@@ -834,7 +849,7 @@ function ganggun(gang)
 end
 
 function wolcarhp(args)
-    if carhpthread ~= nil then notf.addNotification('Ошибка!\n\nНе прошло 2 секунды до предыдущей смены!') return end
+    if carhpthread ~= nil then notf.addNotification('Ошибка!\n\nНе прошло 2 секунды до предыдущей смены!', 5, 1) return end
     carhpthread = lua_thread.create(function()
         if args:find('^%d+') then
         blockcarhp = true
@@ -962,7 +977,7 @@ end
 
 function onScriptTerminate(script, quitGame)
 	if script == idnotf then
-		lua_thread.create(function() wait(10) notf = import 'imgui_notf.lua' notf.addNotification('WolHelper успешно загружен\n\nВерсия скрипта: '..thisScript().version, 5) end)
+		lua_thread.create(function() wait(10) notf = import 'imgui_notf.lua' notf.addNotification('WolHelper успешно загружен\n\nВерсия скрипта: '..thisScript().version, 5, 1) end)
 	end
 end
 
