@@ -246,6 +246,7 @@ function main()
     sampRegisterChatCommand('wolcarhp', wolcarhp)
     sampRegisterChatCommand('wolarmor', wolarmor)
     sampRegisterChatCommand('vig', vigovor)
+    sampRegisterChatCommand('uninvite', uninviteska)
     sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
 
     if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
@@ -978,11 +979,23 @@ function vigovor(arg)
     lua_thread.create(function()
         local id, prichinaviga = arg:match('(%d+) (.+)')
 		if id == nil and prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', -1) return end
-        sampSendChat('Сотрудник '..sampGetPlayerNickname(id):gsub('_', ' ')..' получает выговор')
+		sampSendChat('/vig '..arg)
 		wait(1000)
-        sampSendChat('Причина: '..prichinaviga)
-        wait(1000)
-        sampSendChat('/vig '..arg)
+        sampSendChat('/r Сотрудник '..sampGetPlayerNickname(id):gsub('_', ' ')..' получает выговор')
+		wait(1000)
+        sampSendChat('/r Причина: '..prichinaviga)
+    end)
+end
+
+function uninviteska(arg)
+    lua_thread.create(function()
+        local id, prichinaviga = arg:match('(%d+) (.+)')
+		if id == nil and prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', -1) return end
+		sampSendChat('/uninvite '..arg)
+		wait(1000)
+        sampSendChat('/r Сотрудник '..sampGetPlayerNickname(id):gsub('_', ' ')..' уволен')
+		wait(1000)
+        sampSendChat('/r Причина: '..prichinaviga)
     end)
 end
 
