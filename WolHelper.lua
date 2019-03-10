@@ -43,7 +43,7 @@ u8 = encoding.UTF8
 
 
 script_name('Way_Of_Life_Helper')
-script_version('2.1.1')
+script_version('2.1.2')
 script_author('Saburo Shimizu')
 
 
@@ -245,6 +245,7 @@ function main()
     sampRegisterChatCommand('wolpomeha', pomehaska)
     sampRegisterChatCommand('wolcarhp', wolcarhp)
     sampRegisterChatCommand('wolarmor', wolarmor)
+    sampRegisterChatCommand('vig', vigovor)
     sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
 
     if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
@@ -359,7 +360,6 @@ function SE.onShowDialog(dialogId, style, title, button1, button2, text)
             end
         end
     end
-
     if activ then
         if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№1' then sampSendDialogResponse(dialogId, 1, - 1, '2') end
         if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№2' then sampSendDialogResponse(dialogId, 1, - 1, '4') end
@@ -369,7 +369,6 @@ function SE.onShowDialog(dialogId, style, title, button1, button2, text)
         if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№6' then sampSendDialogResponse(dialogId, 1, - 1, '2') end
         if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№7' then sampSendDialogResponse(dialogId, 1, - 1, '4') lua_thread.create(function() wait(500) getstat = true sampSendChat('/mm') end) end
     end
-
     if getstat == true then
         if title:find('{AEFFFF}Игровой уровень: %d+ | Очки опыта: %d+ из %d+') then
             sampSendDialogResponse(5051, 1, 0, _)
@@ -387,11 +386,9 @@ function SE.onShowDialog(dialogId, style, title, button1, button2, text)
             end
         end
     end
-
     if swatgun == true then
         if title == 'Комплекты « SWAT » San Andreas' then for i = 0, gun * 4 do sampSendDialogResponse(dialogId, tonumber(naambs), - 1, - 1) end lua_thread.create(function() wait(10000) swatgun = false end) end
     end
-
     if autogun == true and title:find('Набор.+') and dialogId == 5051 then
         sampSendDialogResponse(dialogId, 1, 0, 1)
         for i = 0, gun do
@@ -786,6 +783,7 @@ function imgui.OnDrawFrame()
                 imgui.Spacing()
                 if imgui.MenuItem(u8'Повысить') then sampSendChat('/giverank '..membersid..' '..rang + 1) end
                 if imgui.MenuItem(u8'Понизить') then sampSendChat('/giverank '..membersid..' '..rang - 1) end
+                if imgui.MenuItem(u8'Выдать выговор') then sampSetChatInputText('/vig ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
                 if imgui.MenuItem(u8'Уволить') then sampSetChatInputText('/uninvite ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
                 imgui.EndPopup()
             end
@@ -976,6 +974,17 @@ function SE.onSetVehicleHealth(vehicleId, health)
     if blockcarhp then return false end
 end
 
+function vigovor(arg)
+    lua_thread.create(function()
+        local id, prichinaviga = arg:match('(%d+) (.+)')
+		if id == nil and prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', -1) return end
+        sampSendChat('Сотрудник '..sampGetPlayerNickname(id):gsub('_', ' ')..' получает выговор')
+		wait(1000)
+        sampSendChat('Причина: '..prichinaviga)
+        wait(1000)
+        sampSendChat('/vig '..arg)
+    end)
+end
 
 
 
@@ -1108,8 +1117,45 @@ end
 
 
 
-
-
+local russian_characters = {
+    [168] = 'Ё', [184] = 'ё', [192] = 'А', [193] = 'Б', [194] = 'В', [195] = 'Г', [196] = 'Д', [197] = 'Е', [198] = 'Ж', [199] = 'З', [200] = 'И', [201] = 'Й', [202] = 'К', [203] = 'Л', [204] = 'М', [205] = 'Н', [206] = 'О', [207] = 'П', [208] = 'Р', [209] = 'С', [210] = 'Т', [211] = 'У', [212] = 'Ф', [213] = 'Х', [214] = 'Ц', [215] = 'Ч', [216] = 'Ш', [217] = 'Щ', [218] = 'Ъ', [219] = 'Ы', [220] = 'Ь', [221] = 'Э', [222] = 'Ю', [223] = 'Я', [224] = 'а', [225] = 'б', [226] = 'в', [227] = 'г', [228] = 'д', [229] = 'е', [230] = 'ж', [231] = 'з', [232] = 'и', [233] = 'й', [234] = 'к', [235] = 'л', [236] = 'м', [237] = 'н', [238] = 'о', [239] = 'п', [240] = 'р', [241] = 'с', [242] = 'т', [243] = 'у', [244] = 'ф', [245] = 'х', [246] = 'ц', [247] = 'ч', [248] = 'ш', [249] = 'щ', [250] = 'ъ', [251] = 'ы', [252] = 'ь', [253] = 'э', [254] = 'ю', [255] = 'я',
+}
+function string.rlower(s)
+    s = s:lower()
+    local strlen = s:len()
+    if strlen == 0 then return s end
+    s = s:lower()
+    local output = ''
+    for i = 1, strlen do
+        local ch = s:byte(i)
+        if ch >= 192 and ch <= 223 then -- upper russian characters
+            output = output .. russian_characters[ch + 32]
+        elseif ch == 168 then -- Ё
+            output = output .. russian_characters[184]
+        else
+            output = output .. string.char(ch)
+        end
+    end
+    return output
+end
+function string.rupper(s)
+    s = s:upper()
+    local strlen = s:len()
+    if strlen == 0 then return s end
+    s = s:upper()
+    local output = ''
+    for i = 1, strlen do
+        local ch = s:byte(i)
+        if ch >= 224 and ch <= 255 then -- lower russian characters
+            output = output .. russian_characters[ch - 32]
+        elseif ch == 184 then -- ё
+            output = output .. russian_characters[168]
+        else
+            output = output .. string.char(ch)
+        end
+    end
+    return output
+end
 
 
 
