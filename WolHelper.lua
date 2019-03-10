@@ -802,7 +802,7 @@ function imgui.OnDrawFrame()
             end
             imgui.Columns(1)
             if imgui.BeginPopup('membersfunc') then
-                imgui.Text(nick..' ('..rang..')')
+                imgui.Text(nick..' ('..u8(rang)..')')
                 membersid = nick:match('.+%[(%d+)%]')
                 imgui.Separator()
                 imgui.Spacing()
@@ -841,7 +841,7 @@ function imgui.OnDrawFrame()
                 if imgui.MenuItem(k) then imgui.OpenPopup('trenirovkapopup') nick, rang = k, v end
             end
 			if imgui.BeginPopup('trenirovkapopup') then
-                imgui.Text(nick..' ('..rang..')')
+                imgui.Text(nick..' ('..u8(rang)..')')
                 membersid = nick:match('.+%[(%d+)%]')
                 imgui.Separator()
                 imgui.Spacing()
