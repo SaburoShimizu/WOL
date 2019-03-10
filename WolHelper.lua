@@ -105,6 +105,7 @@ dhelp = [[{FF7000}/wolgun - {d5dedd}Взять оружие с любого ме
 {FF7000}/wolleader - {d5dedd}Открыть панель лидеров
 {FF7000}/wolcarhp [+ кол-во] - {d5dedd}Поменять транспорту хп (Если ничего не указать - восстановит)
 {FF7000}/wolarmor [+ кол-во] - {d5dedd}Добавить армор (Если 0, то снимет)
+{FF7000}/wolstroy - {d5dedd}Открыть автострой
 
 
 {FF0000} В [ ] указаны необязательные параметры
@@ -249,7 +250,7 @@ function main()
     sampRegisterChatCommand('wolarmor', wolarmor)
     sampRegisterChatCommand('vig', vigovor)
     sampRegisterChatCommand('uninvite', uninviteska)
-    sampRegisterChatCommand('trenirovka', function() sampSendChat('/members') trenirovkaimgui.v = true end)
+    sampRegisterChatCommand('wolstroy', function() sampSendChat('/members') trenirovkaimgui.v = true end)
     sampRegisterChatCommand('suninvite', function(arg) sampSendChat('/uninvite '..arg) end)
     sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
 
@@ -819,7 +820,7 @@ function imgui.OnDrawFrame()
         if trenirovkaimgui.v then
             imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
             imgui.SetNextWindowSize(imgui.ImVec2(500, 300), imgui.Cond.FirstUseEver)
-            imgui.Begin(u8'Тренировка', trenirovkaimgui, imgui.WindowFlags.NoSavedSettings)
+            imgui.Begin(u8'Автострой', trenirovkaimgui, imgui.WindowFlags.NoSavedSettings)
             imgui.Columns(3, _, false)
             imgui.Text(u8'В строю: ')
 			imgui.Spacing()
