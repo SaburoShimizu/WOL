@@ -43,7 +43,7 @@ u8 = encoding.UTF8
 
 
 script_name('Way_Of_Life_Helper')
-script_version('2.1.2')
+script_version('2.1.3')
 script_author('Saburo Shimizu')
 
 
@@ -161,6 +161,7 @@ local findshow = false
 local blockcarhp = false
 local carhpthread = nil
 local findshowtable = {}
+local vstroy, nevstroy, ryadom = {}, {}, {}
 
 imgui.Process = false
 local btn_size = imgui.ImVec2(-0.1, 0)
@@ -171,6 +172,7 @@ local picupsimgui = imgui.ImBool(false)
 local superkillerubiza = imgui.ImBool(false)
 local findimgui = imgui.ImBool(false)
 local wolleader = imgui.ImBool(false)
+local trenirovkaimgui = imgui.ImBool(false)
 
 local imguiautogun = imgui.ImBool(wol.autogun)
 local imguimvd = imgui.ImBool(wol.mvd)
@@ -247,6 +249,8 @@ function main()
     sampRegisterChatCommand('wolarmor', wolarmor)
     sampRegisterChatCommand('vig', vigovor)
     sampRegisterChatCommand('uninvite', uninviteska)
+    sampRegisterChatCommand('trenirovka', function() sampSendChat('/members') trenirovkaimgui.v = true end)
+    sampRegisterChatCommand('suninvite', function(arg) sampSendChat('/uninvite '..arg) end)
     sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
 
     if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
@@ -255,6 +259,7 @@ function main()
     rkeys.registerHotKey({vkeys.VK_MENU, vkeys.VK_1}, true, function() if not superkillerubiza.v then superkillerubiza.v = true end end)
     rkeys.registerHotKey({vkeys.VK_RETURN}, true, function()
         if findimgui.v then findimgui.v = false end
+        if trenirovkaimgui.v then trenirovkaimgui.v = false end
         if superkillerubiza.v then
             if superkillerubizarezhim.v == 0 then
                 lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) wait(90) end end)
@@ -342,8 +347,26 @@ function SE.onServerMessage(color, text)
     if text:find('.+Вы успешно авторизовались!') then getstat = true sampSendChat('/mm') end
     if text:find('Выдано:   Дубинка') and swatgun then return false end
     --if re.match(text, 's <- {.+} / . s') then sampAddChatMessage(text, -1) end
-    if text:find('Члены организации Online') then findshowtable = {} findshow = true return false end
-    if findshow and text:find('ранг') then local id, nick, rang = text:match('%[(%d+)%] (%a+_%a+) ранг: (.+) ') local name = nick ..' ['..id..']' findshowtable[name] = rang return false end
+    if text:find('Члены организации Online') then findshowtable, vstroy, nevstroy, ryadom = {}, {}, {}, {} findshow = true return false end
+    if findshow and text:find('ранг') then
+        local id, nick, rang = text:match('%[(%d+)%] (%a+_%a+) ранг: (.+) ')
+        local name = nick ..' ['..id..']' findshowtable[name] = rang
+        local result, ped = sampGetCharHandleBySampPlayerId(id)
+        if doesCharExist(ped) then
+            local x, y, z = getCharCoordinates(ped)
+            local mx, my, mz = getCharCoordinates(PLAYER_PED)
+            local dist = getDistanceBetweenCoords3d(mx, my, mz, x, y, z)
+
+            if dist <= 25 then
+                vstroy[name] = rang
+            else
+                ryadom[name] = rang
+            end
+        else
+            nevstroy[name] = rang
+        end
+        return false
+    end
     if text:find('Всего: %d+ человек') then
         findkolvo = text:match('Всего: (%d+) человек')
         findshow = false
@@ -515,7 +538,7 @@ end
 
 
 function imgui.OnDrawFrame()
-    imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v or wolleader.v
+    imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v or wolleader.v or trenirovkaimgui.v
     if scriptmenu.v then
         imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
         imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
@@ -793,6 +816,42 @@ function imgui.OnDrawFrame()
             imgui.Text(u8'Всего игроков: '..findkolvo..'													')
             imgui.End()
         end
+        if trenirovkaimgui.v then
+            imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+            imgui.SetNextWindowSize(imgui.ImVec2(500, 300), imgui.Cond.FirstUseEver)
+            imgui.Begin(u8'Тренировка', trenirovkaimgui, imgui.WindowFlags.NoSavedSettings)
+            imgui.Columns(3, _, false)
+            imgui.Text(u8'В строю: ')
+			imgui.Spacing()
+            for k, v in pairs(vstroy) do
+				if imgui.MenuItem(k) then imgui.OpenPopup('trenirovkapopup') nick, rang = k, v end
+            end
+            imgui.NextColumn()
+            imgui.Text(u8'Не в строю:')
+			imgui.Spacing()
+            for k, v in pairs(nevstroy) do
+				if imgui.MenuItem(k) then imgui.OpenPopup('trenirovkapopup') nick, rang = k, v end
+            end
+            imgui.NextColumn()
+            imgui.Text(u8'Рядом:')
+			imgui.Separator()
+			imgui.Spacing()
+            for k, v in pairs(ryadom) do
+                if imgui.MenuItem(k) then imgui.OpenPopup('trenirovkapopup') nick, rang = k, v end
+            end
+			if imgui.BeginPopup('trenirovkapopup') then
+                imgui.Text(nick..' ('..rang..')')
+                membersid = nick:match('.+%[(%d+)%]')
+                imgui.Separator()
+                imgui.Spacing()
+                if imgui.MenuItem(u8'Повысить') then sampSendChat('/giverank '..membersid..' '..rang + 1) end
+                if imgui.MenuItem(u8'Понизить') then sampSendChat('/giverank '..membersid..' '..rang - 1) end
+                if imgui.MenuItem(u8'Выдать выговор') then sampSetChatInputText('/vig ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
+                if imgui.MenuItem(u8'Уволить') then sampSetChatInputText('/uninvite ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
+                imgui.EndPopup()
+            end
+            imgui.End()
+        end
         if wolleader.v then
             imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
             imgui.Begin(u8'Панель лидера', wolleader, imgui.WindowFlags.AlwaysAutoResize)
@@ -978,11 +1037,11 @@ end
 function vigovor(arg)
     lua_thread.create(function()
         local id, prichinaviga = arg:match('(%d+) (.+)')
-		if id == nil and prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', -1) return end
-		sampSendChat('/vig '..arg)
-		wait(1000)
+        if id == nil and prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', - 1) return end
+        sampSendChat('/vig '..arg)
+        wait(1000)
         sampSendChat('/r Сотрудник '..sampGetPlayerNickname(id):gsub('_', ' ')..' получает выговор')
-		wait(1000)
+        wait(1000)
         sampSendChat('/r Причина: '..prichinaviga)
     end)
 end
@@ -990,11 +1049,11 @@ end
 function uninviteska(arg)
     lua_thread.create(function()
         local id, prichinaviga = arg:match('(%d+) (.+)')
-		if id == nil and prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', -1) return end
-		sampSendChat('/uninvite '..arg)
-		wait(1000)
+        if id == nil and prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', - 1) return end
+        sampSendChat('/uninvite '..arg)
+        wait(1000)
         sampSendChat('/r Сотрудник '..sampGetPlayerNickname(id):gsub('_', ' ')..' уволен')
-		wait(1000)
+        wait(1000)
         sampSendChat('/r Причина: '..prichinaviga)
     end)
 end
