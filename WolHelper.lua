@@ -359,12 +359,12 @@ function SE.onServerMessage(color, text)
             local dist = getDistanceBetweenCoords3d(mx, my, mz, x, y, z)
 
             if dist <= 25 then
-                vstroy[name] = rang
+                vstroy[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
             else
-                ryadom[name] = rang
+                ryadom[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
             end
         else
-            nevstroy[name] = rang
+            nevstroy[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
         end
         return false
     end
