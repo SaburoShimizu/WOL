@@ -129,6 +129,7 @@ local default = {
         wolpass = 0;
         wolalogin = false;
         damag = 4;
+        showpasswordimgui = false;
     }
 }
 
@@ -142,6 +143,7 @@ local restore = {
         wolpass = 0;
         wolalogin = false;
         damag = 4;
+        showpasswordimgui = false;
     }
 }
 
@@ -176,6 +178,7 @@ local wolleader = imgui.ImBool(false)
 local trenirovkaimgui = imgui.ImBool(false)
 
 local imguiautogun = imgui.ImBool(wol.autogun)
+local showpasswordimgui = imgui.ImBool(wol.showpasswordimgui)
 local imguimvd = imgui.ImBool(wol.mvd)
 local imguiaupd = imgui.ImBool(wol.aupd)
 local imguiaulog = imgui.ImBool(wol.wolalogin)
@@ -210,7 +213,7 @@ function main()
     while not isSampAvailable() do wait(100) end
     local ip = sampGetCurrentServerAddress()
 
-    if ip:find('176.32.36.103') or ip:find('176.32.39.159') then activ = true sampAddChatMessage('{FF0000}AutoInvite {FFFFFF}для {00FF00}Way Of Life и After Life {01A0E9}загружен', - 1) sampAddChatMessage(teg ..'/wolhelp - команды скрипта. Версия скрипта: {d5dedd}' ..thisScript().version, - 1) sampAddChatMessage(teg ..'Если ваша статистика не была проверена автоматически введите {FF7000}/getstat', - 1) if wol.mvd then if script.find('MVDhelper Era') then script.find('MVDhelper Era'):unload() end end else thisScript():unload() end
+    if ip:find('176.32.36.103') or ip:find('176.32.39.159') then activ = true sampAddChatMessage('{FF0000}WolHelper {FFFFFF}для {00FF00}Way Of Life и After Life {01A0E9}загружен', - 1) sampAddChatMessage(teg ..'/wolhelp - команды скрипта. Версия скрипта: {d5dedd}' ..thisScript().version, - 1) sampAddChatMessage(teg ..'Если ваша статистика не была проверена автоматически введите {FF7000}/getstat', - 1) if wol.mvd then if script.find('MVDhelper Era') then script.find('MVDhelper Era'):unload() end end else thisScript():unload() end
 
     if script.find('PrisonHelper.lua') then script.find('PrisonHelper.lua'):unload() end
     if aupd == true then apdeit() end
@@ -353,6 +356,7 @@ function SE.onServerMessage(color, text)
         local id, nick, rang = text:match('%[(%d+)%] (%a+_%a+) ранг: (.+) ')
         local name = nick ..' ['..id..']' findshowtable[name] = rang
         local result, ped = sampGetCharHandleBySampPlayerId(id)
+		local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
         if doesCharExist(ped) then
             local x, y, z = getCharCoordinates(ped)
             local mx, my, mz = getCharCoordinates(PLAYER_PED)
@@ -364,6 +368,7 @@ function SE.onServerMessage(color, text)
                 ryadom[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
             end
         else
+			if tonumber(id) == myid then nevstroy[name ..' <<<'] = rang return false end
             nevstroy[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
         end
         return false
@@ -543,7 +548,7 @@ function imgui.OnDrawFrame()
     if scriptmenu.v then
         imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
         imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
-        imgui.Begin(u8'Настройки WolHelper', scriptmenu, imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.MenuBar)
+        imgui.Begin(u8'Настройки WolHelper', scriptmenu, imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.MenuBar + imgui.WindowFlags.NoCollapse)
         if imgui.BeginMenuBar() then
             if imgui.BeginMenu(u8'Меню скрипта') then
                 if imgui.MenuItem(u8'Перезагрузить') then
@@ -618,8 +623,15 @@ function imgui.OnDrawFrame()
             imadd.ToggleButton('alogin##6', imguiaulog)
             wol.wolalogin = imguiaulog.v
             if imguiaulog.v then
-                imgui.InputText(u8'Введите пароль', imguipass)
-                imgui.Text(u8'Текущий пароль: '..wol.wolpass)
+				imgui.Text(u8'Показывать пароль'); ShowHelpMarker('Если выключен - скрывает пароль ***')
+				imgui.SameLine(365)
+				imadd.ToggleButton('aloginshow##6', showpasswordimgui)
+				wol.showpasswordimgui = showpasswordimgui.v
+                if showpasswordimgui.v then
+					imgui.InputText(u8'Введите пароль', imguipass); imgui.Text(u8'Текущий пароль: '..wol.wolpass)
+				else
+					imgui.InputText(u8'Введите пароль', imguipass, imgui.InputTextFlags.Password)
+				end
                 wol.wolpass = u8:decode(imguipass.v)
             end
             imgui.Spacing()
@@ -638,7 +650,7 @@ function imgui.OnDrawFrame()
     if imguifaq.v then
         imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
         imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
-        imgui.Begin(u8'F.A.Q', imguifaq, imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoSavedSettings)
+        imgui.Begin(u8'F.A.Q', imguifaq, imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoSavedSettings + imgui.WindowFlags.NoCollapse)
         imgui.CenterTextColoredRGB(dhelp)
         if isKeyJustPressed(0x1B) or isKeyJustPressed(0x08) or isKeyJustPressed(0x0D) then imguifaq.v = false end
         imgui.End()
@@ -646,7 +658,7 @@ function imgui.OnDrawFrame()
     if tporg.v then
         imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
         --imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
-        imgui.Begin(u8'ТП меню', tporg, imgui.WindowFlags.AlwaysAutoResize)
+        imgui.Begin(u8'ТП меню', tporg, imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoCollapse)
         if isCharInAnyCar(PLAYER_PED) then
             if imgui.CollapsingHeader(u8'ТП (с авто)') then
                 if imgui.MenuItem(u8'LS') then setCharCoordinates(PLAYER_PED, 1057, - 1403, 13) tporg.v = false end
@@ -735,7 +747,7 @@ function imgui.OnDrawFrame()
         if picupsimgui.v then
             imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
             --imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
-            imgui.Begin(u8'Меню пикапов', picupsimgui, imgui.WindowFlags.AlwaysAutoResize)
+            imgui.Begin(u8'Меню пикапов', picupsimgui, imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoCollapse)
             if imgui.MenuItem(u8'Смена скина') then sampSendPickedUpPickup(picups['Clotch']) picupsimgui.v = false end
             if imgui.MenuItem(u8'Автоугонщик') then sampSendPickedUpPickup(95) picupsimgui.v = false end
             if imgui.CollapsingHeader(u8'Автосалоны') then
@@ -821,7 +833,7 @@ function imgui.OnDrawFrame()
             imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
             imgui.SetNextWindowSize(imgui.ImVec2(500, 300), imgui.Cond.FirstUseEver)
             imgui.Begin(u8'Автострой', trenirovkaimgui, imgui.WindowFlags.NoSavedSettings)
-            imgui.Columns(3, _, false)
+            imgui.Columns(3, _, true)
             imgui.Text(u8'В строю: ')
 			imgui.Spacing()
             for k, v in pairs(vstroy) do
@@ -834,7 +846,7 @@ function imgui.OnDrawFrame()
 				if imgui.MenuItem(k) then imgui.OpenPopup('trenirovkapopup') nick, rang = k, v end
             end
             imgui.NextColumn()
-            imgui.Text(u8'Рядом:')
+            imgui.Text(u8'В зоне стрима:')
 			imgui.Separator()
 			imgui.Spacing()
             for k, v in pairs(ryadom) do
@@ -855,7 +867,7 @@ function imgui.OnDrawFrame()
         end
         if wolleader.v then
             imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-            imgui.Begin(u8'Панель лидера', wolleader, imgui.WindowFlags.AlwaysAutoResize)
+            imgui.Begin(u8'Панель лидера', wolleader, imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoCollapse)
             imgui.PushItemWidth(250)
             imgui.Combo('##leader', wolleadermenu, govmenu)
             imgui.PushItemWidth()
