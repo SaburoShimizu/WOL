@@ -664,6 +664,7 @@ function imgui.OnDrawFrame()
                 if imgui.MenuItem(u8'LS') then setCharCoordinates(PLAYER_PED, 1057, - 1403, 13) tporg.v = false end
                 if imgui.MenuItem(u8'SF') then setCharCoordinates(PLAYER_PED, - 1818, - 579, 16) tporg.v = false end
                 if imgui.MenuItem(u8'LV') then setCharCoordinates(PLAYER_PED, 1797, 842, 10) tporg.v = false end
+				if imgui.MenuItem(u8'Банк LS') then setCharCoordinates(PLAYER_PED, 1463, - 1027, 23) tporg.v = false end
                 if imgui.MenuItem(u8'Мэрия LS') then setCharCoordinates(PLAYER_PED, 1476, - 1708, 14) tporg.v = false end
                 if imgui.MenuItem(u8'VineVood') then setCharCoordinates(PLAYER_PED, 1373, - 927, 34) tporg.v = false end
                 if imgui.MenuItem(u8'Мост ЛС - СФ') then setCharCoordinates(PLAYER_PED, 56, - 1531, 5) tporg.v = false end
@@ -675,6 +676,7 @@ function imgui.OnDrawFrame()
             if imgui.MenuItem(u8'LSPD') then sampSendPickedUpPickup(103) tporg.v = false end
             if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(198) tporg.v = false end
             if imgui.MenuItem(u8'Мэрия (сзади)') then sampSendPickedUpPickup(200) tporg.v = false end
+            if imgui.MenuItem(u8'Банк') then sampSendPickedUpPickup(29) tporg.v = false end
             if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(212) tporg.v = false end
             if imgui.MenuItem(u8'S.W.A.T') then sampSendPickedUpPickup(24) tporg.v = false end
             if imgui.MenuItem(u8'FBI') then sampSendPickedUpPickup(181) tporg.v = false end
@@ -694,6 +696,7 @@ function imgui.OnDrawFrame()
             if imgui.MenuItem(u8'LSPD') then sampSendPickedUpPickup(104) tporg.v = false end
             if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(201) tporg.v = false end
             if imgui.MenuItem(u8'Мэрия (сзади)') then sampSendPickedUpPickup(199) tporg.v = false end
+			if imgui.MenuItem(u8'Банк') then sampSendPickedUpPickup(30) tporg.v = false end
             if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(213) tporg.v = false end
             if imgui.MenuItem(u8'S.W.A.T') then sampSendPickedUpPickup(25) tporg.v = false end
             if imgui.MenuItem(u8'FBI') then sampSendPickedUpPickup(180) tporg.v = false end
