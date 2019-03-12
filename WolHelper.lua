@@ -86,6 +86,37 @@ bandgun = {
     [14] = {2186, - 1807, 13}, -- Rifa
 }
 
+adminfraklist = {
+    [0] = 'Гражданские',
+    [1] = 'LSPD',
+    [2] = 'FBI',
+    [3] = 'Army SF',
+    [4] = 'Мин.Здрав',
+    [5] = 'La Cosa Nostra',
+    [6] = 'Yakuza',
+    [7] = 'Мэрия',
+    [8] = 'Пустой слот',
+    [9] = 'Пустой слот',
+    [10] = 'SFPD',
+    [11] = 'Инструкторы',
+    [12] = 'Ballas Gang',
+    [13] = 'Vagos Gang',
+    [14] = 'Russian Mafia',
+    [15] = 'Grove Street Gang',
+    [16] = 'San News',
+    [17] = 'Aztecas Gang',
+    [18] = 'Rifa Gang',
+    [19] = 'Army LV',
+    [20] = 'Пустой слот',
+    [21] = 'LVPD',
+    [22] = 'Пустой слот',
+    [23] = 'Hitmans',
+    [24] = 'Street Racers',
+    [25] = 'S.W.A.T',
+    [26] = 'Правительство',
+    [27] = 'ВВС',
+}
+
 
 
 
@@ -158,6 +189,8 @@ local sw, sh = getScreenResolution()
 local orgs = nil
 local getstat = false
 local swatgun = false
+local fraqlist = 0
+local fraqname = ''
 local naambs = 1
 local findkolvo = 0
 local findshow = false
@@ -176,6 +209,7 @@ local superkillerubiza = imgui.ImBool(false)
 local findimgui = imgui.ImBool(false)
 local wolleader = imgui.ImBool(false)
 local trenirovkaimgui = imgui.ImBool(false)
+local adminfrak = imgui.ImBool(false)
 
 local imguiautogun = imgui.ImBool(wol.autogun)
 local showpasswordimgui = imgui.ImBool(wol.showpasswordimgui)
@@ -237,7 +271,7 @@ function main()
     --imgui.Process = true
     sampRegisterChatCommand('swatgun', function(nambs) if nambs == '1' or nambs == '0' then naambs = nambs else sampAddChatMessage(teg ..'Вы введи неправильно команду. {FF7000}/swatgun [0-1]', - 1) end end)
     sampRegisterChatCommand('wolgun', wolgun)
-    sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
+    --sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
     sampRegisterChatCommand('getjob', function() sampSendPickedUpPickup(168) end)
     sampRegisterChatCommand('getstat', function() getstat = true sampSendChat('/mm') end)
     sampRegisterChatCommand('wolhelp', function() imguifaq.v = true end)
@@ -256,6 +290,8 @@ function main()
     sampRegisterChatCommand('wolstroy', function() sampSendChat('/members') trenirovkaimgui.v = true end)
     sampRegisterChatCommand('suninvite', function(arg) sampSendChat('/uninvite '..arg) end)
     sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
+    sampRegisterChatCommand('amembers', function() wolleader.v = true end)
+    sampRegisterChatCommand('woladmin', function() adminfrak.v = true end)
 
     if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
 
@@ -351,12 +387,12 @@ function SE.onServerMessage(color, text)
     if text:find('.+Вы успешно авторизовались!') then getstat = true sampSendChat('/mm') end
     if text:find('Выдано:   Дубинка') and swatgun then return false end
     --if re.match(text, 's <- {.+} / . s') then sampAddChatMessage(text, -1) end
-    if text:find('Члены организации Online') then findshowtable, vstroy, nevstroy, ryadom = {}, {}, {}, {} findshow = true return false end
+    if text:find('Члены организации Online') or text:find('Члены организации %{FFFFFF%}№2 %{059BD3%}Online:') then findshowtable, vstroy, nevstroy, ryadom = {}, {}, {}, {} findshow = true findimgui.v = true return false end
     if findshow and text:find('ранг') then
         local id, nick, rang = text:match('%[(%d+)%] (%a+_%a+) ранг: (.+) ')
         local name = nick ..' ['..id..']' findshowtable[name] = rang
         local result, ped = sampGetCharHandleBySampPlayerId(id)
-		local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
+        local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
         if doesCharExist(ped) then
             local x, y, z = getCharCoordinates(ped)
             local mx, my, mz = getCharCoordinates(PLAYER_PED)
@@ -368,7 +404,7 @@ function SE.onServerMessage(color, text)
                 ryadom[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
             end
         else
-			if tonumber(id) == myid then nevstroy[name ..' <<<'] = rang return false end
+            if tonumber(id) == myid then nevstroy[name ..' <<<'] = rang return false end
             nevstroy[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
         end
         return false
@@ -544,7 +580,7 @@ end
 
 
 function imgui.OnDrawFrame()
-    imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v or wolleader.v or trenirovkaimgui.v
+    imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v or wolleader.v or trenirovkaimgui.v or adminfrak.v
     if scriptmenu.v then
         imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
         imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
@@ -592,6 +628,9 @@ function imgui.OnDrawFrame()
                 if imgui.MenuItem(u8'Проверка статистики') then
                     getstat = true sampSendChat('/mm')
                 end
+                if imgui.MenuItem(u8'Админ. функции') then
+                    adminfrak.v = true scriptmenu.v = false
+                end
                 imgui.EndMenu()
             end
             if imgui.BeginMenu('F.A.Q') then
@@ -623,15 +662,15 @@ function imgui.OnDrawFrame()
             imadd.ToggleButton('alogin##6', imguiaulog)
             wol.wolalogin = imguiaulog.v
             if imguiaulog.v then
-				imgui.Text(u8'Показывать пароль'); ShowHelpMarker('Если выключен - скрывает пароль ***')
-				imgui.SameLine(365)
-				imadd.ToggleButton('aloginshow##6', showpasswordimgui)
-				wol.showpasswordimgui = showpasswordimgui.v
+                imgui.Text(u8'Показывать пароль'); ShowHelpMarker('Если выключен - скрывает пароль ***')
+                imgui.SameLine(365)
+                imadd.ToggleButton('aloginshow##6', showpasswordimgui)
+                wol.showpasswordimgui = showpasswordimgui.v
                 if showpasswordimgui.v then
-					imgui.InputText(u8'Введите пароль', imguipass); imgui.Text(u8'Текущий пароль: '..wol.wolpass)
-				else
-					imgui.InputText(u8'Введите пароль', imguipass, imgui.InputTextFlags.Password)
-				end
+                    imgui.InputText(u8'Введите пароль', imguipass); imgui.Text(u8'Текущий пароль: '..wol.wolpass)
+                else
+                    imgui.InputText(u8'Введите пароль', imguipass, imgui.InputTextFlags.Password)
+                end
                 wol.wolpass = u8:decode(imguipass.v)
             end
             imgui.Spacing()
@@ -664,7 +703,7 @@ function imgui.OnDrawFrame()
                 if imgui.MenuItem(u8'LS') then setCharCoordinates(PLAYER_PED, 1057, - 1403, 13) tporg.v = false end
                 if imgui.MenuItem(u8'SF') then setCharCoordinates(PLAYER_PED, - 1818, - 579, 16) tporg.v = false end
                 if imgui.MenuItem(u8'LV') then setCharCoordinates(PLAYER_PED, 1797, 842, 10) tporg.v = false end
-				if imgui.MenuItem(u8'Банк LS') then setCharCoordinates(PLAYER_PED, 1463, - 1027, 23) tporg.v = false end
+                if imgui.MenuItem(u8'Банк LS') then setCharCoordinates(PLAYER_PED, 1463, - 1027, 23) tporg.v = false end
                 if imgui.MenuItem(u8'Мэрия LS') then setCharCoordinates(PLAYER_PED, 1476, - 1708, 14) tporg.v = false end
                 if imgui.MenuItem(u8'VineVood') then setCharCoordinates(PLAYER_PED, 1373, - 927, 34) tporg.v = false end
                 if imgui.MenuItem(u8'Мост ЛС - СФ') then setCharCoordinates(PLAYER_PED, 56, - 1531, 5) tporg.v = false end
@@ -696,7 +735,7 @@ function imgui.OnDrawFrame()
             if imgui.MenuItem(u8'LSPD') then sampSendPickedUpPickup(104) tporg.v = false end
             if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(201) tporg.v = false end
             if imgui.MenuItem(u8'Мэрия (сзади)') then sampSendPickedUpPickup(199) tporg.v = false end
-			if imgui.MenuItem(u8'Банк') then sampSendPickedUpPickup(30) tporg.v = false end
+            if imgui.MenuItem(u8'Банк') then sampSendPickedUpPickup(30) tporg.v = false end
             if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(213) tporg.v = false end
             if imgui.MenuItem(u8'S.W.A.T') then sampSendPickedUpPickup(25) tporg.v = false end
             if imgui.MenuItem(u8'FBI') then sampSendPickedUpPickup(180) tporg.v = false end
@@ -825,6 +864,7 @@ function imgui.OnDrawFrame()
                 if imgui.MenuItem(u8'Понизить') then sampSendChat('/giverank '..membersid..' '..rang - 1) end
                 if imgui.MenuItem(u8'Выдать выговор') then sampSetChatInputText('/vig ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
                 if imgui.MenuItem(u8'Уволить') then sampSetChatInputText('/uninvite ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
+				if imgui.MenuItem(u8'[ADM] Уволить') then sampSetChatInputText('/uval ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
                 imgui.EndPopup()
             end
             imgui.NewLine()
@@ -838,24 +878,24 @@ function imgui.OnDrawFrame()
             imgui.Begin(u8'Автострой', trenirovkaimgui, imgui.WindowFlags.NoSavedSettings)
             imgui.Columns(3, _, true)
             imgui.Text(u8'В строю: ')
-			imgui.Spacing()
+            imgui.Spacing()
             for k, v in pairs(vstroy) do
-				if imgui.MenuItem(k) then imgui.OpenPopup('trenirovkapopup') nick, rang = k, v end
+                if imgui.MenuItem(k) then imgui.OpenPopup('trenirovkapopup') nick, rang = k, v end
             end
             imgui.NextColumn()
             imgui.Text(u8'Не в строю:')
-			imgui.Spacing()
+            imgui.Spacing()
             for k, v in pairs(nevstroy) do
-				if imgui.MenuItem(k) then imgui.OpenPopup('trenirovkapopup') nick, rang = k, v end
+                if imgui.MenuItem(k) then imgui.OpenPopup('trenirovkapopup') nick, rang = k, v end
             end
             imgui.NextColumn()
             imgui.Text(u8'В зоне стрима:')
-			imgui.Separator()
-			imgui.Spacing()
+            imgui.Separator()
+            imgui.Spacing()
             for k, v in pairs(ryadom) do
                 if imgui.MenuItem(k) then imgui.OpenPopup('trenirovkapopup') nick, rang = k, v end
             end
-			if imgui.BeginPopup('trenirovkapopup') then
+            if imgui.BeginPopup('trenirovkapopup') then
                 imgui.Text(nick..' ('..u8(rang)..')')
                 membersid = nick:match('.+%[(%d+)%]')
                 imgui.Separator()
@@ -864,6 +904,7 @@ function imgui.OnDrawFrame()
                 if imgui.MenuItem(u8'Понизить') then sampSendChat('/giverank '..membersid..' '..rang - 1) end
                 if imgui.MenuItem(u8'Выдать выговор') then sampSetChatInputText('/vig ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
                 if imgui.MenuItem(u8'Уволить') then sampSetChatInputText('/uninvite ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
+                if imgui.MenuItem(u8'[ADM] Уволить') then sampSetChatInputText('/uval ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
                 imgui.EndPopup()
             end
             imgui.End()
@@ -959,6 +1000,38 @@ function imgui.OnDrawFrame()
                         filesska:close()
                     end
                 end
+            end
+            imgui.End()
+        end
+        if adminfrak.v then
+            imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+            imgui.SetNextWindowSize(imgui.ImVec2(500, 300), imgui.Cond.FirstUseEver)
+            imgui.Begin(u8'Админ. функции', adminfrak, imgui.WindowFlags.NoSavedSettings + imgui.WindowFlags.AlwaysAutoResize)
+            if imgui.CollapsingHeader(u8'Функции с фракциями') then
+                for i, v in ipairs(adminfraklist) do
+                    if v ~= 'Пустой слот' then
+                        if imgui.MenuItem(u8(v)) then
+                            fraqlist = i
+                            fraqname = v
+                            imgui.OpenPopup('fraqmenu')
+                        end
+                    end
+                end
+            end
+            if imgui.BeginPopup('fraqmenu') then
+                imgui.Text(u8(fraqname ..string.format(' (%d)', fraqlist)))
+                imgui.Separator()
+                imgui.Spacing()
+                if imgui.MenuItem(u8'Проверить число игроков') then
+                    sampSendChat('/amembers '..fraqlist)
+                end
+                if imgui.MenuItem(u8'Встать на зама') then
+                    sampSendChat('/frakinvite '..fraqlist)
+                end
+                if imgui.MenuItem(u8'Встать на временную лиду') then
+                    sampAddChatMessage('/makeleader ' ..fraqlist, - 1)--sampSendChat('/frakinvite '..id)
+                end
+                imgui.EndPopup()
             end
             imgui.End()
         end
@@ -1251,6 +1324,10 @@ function onScriptTerminate(script, quitGame)
     if script == idnotf then
         lua_thread.create(function() wait(10) notf = import 'imgui_notf.lua' notf.addNotification('WolHelper успешно загружен\n\nВерсия скрипта: '..thisScript().version, 5, 1) end)
     end
+    if script == thisScript() then
+        sampAddChatMessage(teg ..'Скрипт крашнуло. Перезагружен автоматически', - 1)
+        thisScript():reload()
+    end
 end
 
 function inFileRead(read_patch)
@@ -1369,7 +1446,41 @@ function async_http_request(method, url, args, resolve, reject)
     end)
 end
 
+function imgui.TextColoredRGB(string)
+    local style = imgui.GetStyle()
+    local colors = style.Colors
+    local clr = imgui.Col
 
+    local function color_imvec4(color)
+        if color:upper() == 'SSSSSS' then return colors[clr.Text] end
+        local color = type(color) == 'number' and ('%X'):format(color):upper() or color:upper()
+        local rgb = {}
+        for i = 1, #color / 2 do rgb[#rgb + 1] = tonumber(color:sub(2 * i - 1, 2 * i), 16) end
+        return imgui.ImVec4(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, rgb[4] and rgb[4] / 255 or colors[clr.Text].w)
+    end
+
+    local function render_text(string)
+        local text, color = {}, {}
+        local m = 1
+        while string:find('{......}') do
+            local n, k = string:find('{......}')
+            text[#text], text[#text + 1] = string:sub(m, n - 1), string:sub(k + 1, #string)
+            color[#color + 1] = color_imvec4(string:sub(n + 1, k - 1))
+            local t1, t2 = string:sub(1, n - 1), string:sub(k + 1, #string)
+            string = t1..t2
+            m = k - 7
+        end
+        if text[0] then
+            for i, _ in ipairs(text) do
+                imgui.TextColored(color[i] or colors[clr.Text], u8(text[i]))
+                imgui.SameLine(nil, 0)
+            end
+            imgui.NewLine()
+        else imgui.Text(u8(string)) end
+    end
+
+    render_text(string)
+end
 
 function getTargetBlipCoordinatesFixed()
     local bool, x, y, z = getTargetBlipCoordinates(); if not bool then return false end
