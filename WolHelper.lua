@@ -198,6 +198,7 @@ local blockcarhp = false
 local carhpthread = nil
 local findshowtable = {}
 local vstroy, nevstroy, ryadom = {}, {}, {}
+local adminlist = {}
 
 imgui.Process = false
 local btn_size = imgui.ImVec2(-0.1, 0)
@@ -210,6 +211,7 @@ local findimgui = imgui.ImBool(false)
 local wolleader = imgui.ImBool(false)
 local trenirovkaimgui = imgui.ImBool(false)
 local adminfrak = imgui.ImBool(false)
+local adminsimgui = imgui.ImBool(false)
 
 local imguiautogun = imgui.ImBool(wol.autogun)
 local showpasswordimgui = imgui.ImBool(wol.showpasswordimgui)
@@ -294,6 +296,7 @@ function main()
     sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
     sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
     sampRegisterChatCommand('woladmin', function() adminfrak.v = true end)
+    sampRegisterChatCommand('admins', function() sampSendChat('/admins') adminsimgui.v = true end)
 
     if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
 
@@ -392,7 +395,7 @@ function SE.onServerMessage(color, text)
     if text:find('Члены организации Online') or text:find('Члены организации %{FFFFFF%}№.+ %{059BD3%}Online:') then findshowtable, vstroy, nevstroy, ryadom = {}, {}, {}, {} findshow = true return false end
     if findshow and text:find('ранг') then
         local id, nick, rang = text:match('%[(%d+)%] (%a+_%a+) ранг: (.+) ')
-		if id == nil or rang == nil then sampAddChatMessage(teg ..'Произошла ошибка. Ник: '..nick, -1) return end
+        if id == nil or rang == nil then sampAddChatMessage(teg ..'Произошла ошибка. Ник: '..nick, - 1) return end
         local name = nick ..' ['..id..']' findshowtable[name] = rang
         local result, ped = sampGetCharHandleBySampPlayerId(id)
         local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
@@ -466,6 +469,17 @@ function SE.onShowDialog(dialogId, style, title, button1, button2, text)
             sampSendDialogResponse(dialogId, 1, 5, 1)
             sampSendDialogResponse(dialogId, 1, 6, 1)
         end
+    end
+    if title == '{FFFFFF}.:: Way Of Life {FFFFFF}Admins {22FF22}Online ::.' then
+        adminlist = {}
+        for line in text:gmatch("[^\r\n]+") do
+            if line:find('.+%{FFFFFF%}.+%[%d+%].+%(%d+/3%).+%[%d+/3%].+%{22FF22%}%d+') then
+                prefix, admname, admrang, adminawarn, adminowarn, adminid = line:match('(.+)%{FFFFFF%}(.+)%[(%d+)%].+%((%d+)/3%).+%[(%d+)/3%].+%{22FF22%}(%d+)')
+				--adminlist = {prefix = prefix, admname = admname}
+                table.insert(adminlist, {prefix = prefix, admname = admname, admrang = admrang, adminawarn = adminawarn, adminowarn = adminowarn, adminid = adminid})
+            end
+        end
+		return false
     end
 end
 
@@ -583,7 +597,7 @@ end
 
 
 function imgui.OnDrawFrame()
-    imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v or wolleader.v or trenirovkaimgui.v or adminfrak.v
+    imgui.ShowCursor = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v or wolleader.v or trenirovkaimgui.v or adminfrak.v or adminsimgui.v
     if scriptmenu.v then
         imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
         imgui.SetNextWindowSize(imgui.ImVec2(400, 300), imgui.Cond.FirstUseEver)
@@ -867,7 +881,7 @@ function imgui.OnDrawFrame()
                 if imgui.MenuItem(u8'Понизить') then sampSendChat('/giverank '..membersid..' '..rang - 1) end
                 if imgui.MenuItem(u8'Выдать выговор') then sampSetChatInputText('/vig ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
                 if imgui.MenuItem(u8'Уволить') then sampSetChatInputText('/uninvite ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
-				if imgui.MenuItem(u8'[ADM] Уволить') then sampSetChatInputText('/uval ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
+                if imgui.MenuItem(u8'[ADM] Уволить') then sampSetChatInputText('/uval ' ..membersid ..' ') sampSetChatInputEnabled(true) findimgui.v = false end
                 imgui.EndPopup()
             end
             imgui.NewLine()
@@ -1027,11 +1041,11 @@ function imgui.OnDrawFrame()
                 imgui.Spacing()
                 if imgui.MenuItem(u8'Проверить число игроков') then
                     sampSendChat('/amembers '..fraqlist)
-					findimgui.v = true
+                    findimgui.v = true
                 end
                 if imgui.MenuItem(u8'Автострой') then
                     sampSendChat('/amembers '..fraqlist)
-					trenirovkaimgui.v = true
+                    trenirovkaimgui.v = true
                 end
                 if imgui.MenuItem(u8'Встать на зама') then
                     sampSendChat('/frakinvite '..fraqlist)
@@ -1043,6 +1057,47 @@ function imgui.OnDrawFrame()
             end
             imgui.End()
         end
+		if adminsimgui.v then
+			imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+			imgui.SetNextWindowSize(imgui.ImVec2(600, 450), imgui.Cond.FirstUseEver)
+			imgui.Begin(u8'Админы в сети.', adminsimgui, imgui.WindowFlags.NoSavedSettings)
+			imgui.Columns(3, _, true)
+			imgui.SetColumnWidth(-1, 220)
+			imgui.Text(u8'Prefix')
+			for i, v in ipairs(adminlist) do
+				imgui.TextColoredRGB(v['prefix'])
+			end
+			imgui.NextColumn()
+			imgui.Text(u8'Ник [ID] + (лвл):')
+			for i, v in ipairs(adminlist) do
+				if imgui.MenuItem(string.format('%s [%s] (%s)', v['admname'], v['adminid'], v['admrang'])) then
+					adminmenu = v
+					imgui.OpenPopup('adminmenuimgui')
+				end
+			end
+			imgui.NextColumn()
+			imgui.Text(u8'(Awarn) + [Owarn]')
+			imgui.Separator()
+			for i, v in ipairs(adminlist) do
+				imgui.Text(string.format('(%s/3) [%s/3]', v['adminawarn'], v['adminowarn']))
+			end
+			if imgui.BeginPopup('adminmenuimgui') then
+				imgui.Text(u8(string.format('%s [%s] (%s)', adminmenu['admname'], adminmenu['adminid'], adminmenu['admrang'])))
+				imgui.Text(u8(string.format('Awarns: (%s/3), Owarns: (%s/3)', adminmenu['adminawarn'], adminmenu['adminowarn'])))
+				imgui.Separator()
+				imgui.Spacing()
+				if imgui.MenuItem(u8'Проверить доступы') then sampSendChat('/dostup ' ..adminmenu['adminid']) adminsimgui.v = false end
+				imgui.Spacing()
+				if imgui.MenuItem(u8'Выдать скин') then sampSetChatInputText('/setskin ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
+				if imgui.MenuItem(u8'Выдать префикс') then sampSetChatInputText('/prefix ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
+				if imgui.MenuItem(u8'Выдать pidpis') then sampSetChatInputText('/pidpis ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
+				imgui.Spacing()
+				if imgui.MenuItem(u8'Выдать аварн') then sampSetChatInputText('/adminwarn ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
+				if imgui.MenuItem(u8'Выдать оварн') then sampSetChatInputText('/owarn ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
+				imgui.EndPopup()
+			end
+			imgui.End()
+		end
     end
 
 
