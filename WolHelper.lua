@@ -286,6 +286,8 @@ function main()
     sampRegisterChatCommand('wolcarhp', wolcarhp)
     sampRegisterChatCommand('wolarmor', wolarmor)
     sampRegisterChatCommand('vig', vigovor)
+    sampRegisterChatCommand('ф', function(args) if #args > 0 then sampSendChat('/a '..args) end end)
+    sampRegisterChatCommand('щ', function(args) if #args > 0 then sampSendChat('/o '..args) end end)
     sampRegisterChatCommand('uninvite', uninviteska)
     sampRegisterChatCommand('wolstroy', function() sampSendChat('/members') trenirovkaimgui.v = true end)
     sampRegisterChatCommand('suninvite', function(arg) sampSendChat('/uninvite '..arg) end)
@@ -390,6 +392,7 @@ function SE.onServerMessage(color, text)
     if text:find('Члены организации Online') or text:find('Члены организации %{FFFFFF%}№.+ %{059BD3%}Online:') then findshowtable, vstroy, nevstroy, ryadom = {}, {}, {}, {} findshow = true return false end
     if findshow and text:find('ранг') then
         local id, nick, rang = text:match('%[(%d+)%] (%a+_%a+) ранг: (.+) ')
+		if id == nil or rang == nil then sampAddChatMessage(teg ..'Произошла ошибка. Ник: '..nick, -1) return end
         local name = nick ..' ['..id..']' findshowtable[name] = rang
         local result, ped = sampGetCharHandleBySampPlayerId(id)
         local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
