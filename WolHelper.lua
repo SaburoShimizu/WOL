@@ -1091,11 +1091,11 @@ function imgui.OnDrawFrame()
 				if imgui.MenuItem(u8'Проверить доступы') then sampSendChat('/dostup ' ..adminmenu['adminid']) adminsimgui.v = false end
 				if imgui.MenuItem(u8'Проверить одоступы') then sampSendChat('/odostup ' ..adminmenu['adminid']) adminsimgui.v = false end
 				if imgui.MenuItem(u8'Проверить статистику') then sampSendChat('/getstats ' ..adminmenu['adminid']) adminsimgui.v = false end
-				imgui.Spacing()
+				imgui.Separator()
 				if imgui.MenuItem(u8'Выдать скин') then sampSetChatInputText('/setskin ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
 				if imgui.MenuItem(u8'Выдать префикс') then sampSetChatInputText('/prefix ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
 				if imgui.MenuItem(u8'Выдать pidpis') then sampSetChatInputText('/pidpis ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
-				imgui.Spacing()
+				imgui.Separator()
 				if imgui.MenuItem(u8'Выдать аварн') then sampSetChatInputText('/adminwarn ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
 				if imgui.MenuItem(u8'Выдать оварн') then sampSetChatInputText('/owarn ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
 				imgui.EndPopup()
