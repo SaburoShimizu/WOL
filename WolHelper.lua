@@ -1024,6 +1024,8 @@ function imgui.OnDrawFrame()
             imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
             imgui.SetNextWindowSize(imgui.ImVec2(500, 300), imgui.Cond.FirstUseEver)
             imgui.Begin(u8'Админ. функции', adminfrak, imgui.WindowFlags.NoSavedSettings + imgui.WindowFlags.AlwaysAutoResize)
+			if imgui.MenuItem(u8'Использовать /agm') then sampSendChat('/agm') adminfrak.v = false end
+			if imgui.MenuItem(u8'Использовать /offgoto') then sampSendChat('/offgoto') adminfrak.v = false end
             if imgui.CollapsingHeader(u8'Функции с фракциями') then
                 for i, v in ipairs(adminfraklist) do
                     if v ~= 'Пустой слот' then
