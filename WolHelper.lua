@@ -290,7 +290,7 @@ function main()
     sampRegisterChatCommand('wolstroy', function() sampSendChat('/members') trenirovkaimgui.v = true end)
     sampRegisterChatCommand('suninvite', function(arg) sampSendChat('/uninvite '..arg) end)
     sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
-    sampRegisterChatCommand('amembers', function() wolleader.v = true end)
+    sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
     sampRegisterChatCommand('woladmin', function() adminfrak.v = true end)
 
     if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
@@ -387,7 +387,7 @@ function SE.onServerMessage(color, text)
     if text:find('.+Вы успешно авторизовались!') then getstat = true sampSendChat('/mm') end
     if text:find('Выдано:   Дубинка') and swatgun then return false end
     --if re.match(text, 's <- {.+} / . s') then sampAddChatMessage(text, -1) end
-    if text:find('Члены организации Online') or text:find('Члены организации %{FFFFFF%}№.+ %{059BD3%}Online:') then findshowtable, vstroy, nevstroy, ryadom = {}, {}, {}, {} findshow = true findimgui.v = true return false end
+    if text:find('Члены организации Online') or text:find('Члены организации %{FFFFFF%}№.+ %{059BD3%}Online:') then findshowtable, vstroy, nevstroy, ryadom = {}, {}, {}, {} findshow = true return false end
     if findshow and text:find('ранг') then
         local id, nick, rang = text:match('%[(%d+)%] (%a+_%a+) ранг: (.+) ')
         local name = nick ..' ['..id..']' findshowtable[name] = rang
@@ -1024,6 +1024,11 @@ function imgui.OnDrawFrame()
                 imgui.Spacing()
                 if imgui.MenuItem(u8'Проверить число игроков') then
                     sampSendChat('/amembers '..fraqlist)
+					findimgui.v = true
+                end
+                if imgui.MenuItem(u8'Автострой') then
+                    sampSendChat('/amembers '..fraqlist)
+					trenirovkaimgui.v = true
                 end
                 if imgui.MenuItem(u8'Встать на зама') then
                     sampSendChat('/frakinvite '..fraqlist)
