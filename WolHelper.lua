@@ -304,6 +304,7 @@ function main()
     rkeys.registerHotKey({vkeys.VK_MENU, vkeys.VK_1}, true, function() if not superkillerubiza.v then superkillerubiza.v = true end end)
     rkeys.registerHotKey({vkeys.VK_RETURN}, true, function()
         if findimgui.v then findimgui.v = false end
+        if adminsimgui.v then adminsimgui.v = false end
         if trenirovkaimgui.v then trenirovkaimgui.v = false end
         if superkillerubiza.v then
             if superkillerubizarezhim.v == 0 then
