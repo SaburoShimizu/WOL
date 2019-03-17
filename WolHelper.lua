@@ -120,7 +120,6 @@ adminfraklist = {
 
 
 
-
 dhelp = [[{FF7000}/wolgun - {d5dedd}Взять оружие с любого места
 {FF7000}/getjob - {d5dedd}Взять пикап с трудоустройством с любого места
 {FF7000}/swatgun - {d5dedd}Автоматически взять оружие
@@ -192,10 +191,12 @@ local swatgun = false
 local fraqlist = 0
 local fraqname = ''
 local naambs = 1
+local vsegoadm = 1
 local findkolvo = 0
 local findshow = false
 local blockcarhp = false
 local carhpthread = nil
+local strobes = false
 local findshowtable = {}
 local vstroy, nevstroy, ryadom = {}, {}, {}
 local adminlist = {}
@@ -243,6 +244,27 @@ local govmenu = {
     [3] = u8'Конец собеседования',
 }
 
+
+strobesfunc = lua_thread.create_suspended(function()
+	if not isCharOnAnyBike(PLAYER_PED) and not isCharInAnyBoat(PLAYER_PED) and not isCharInAnyHeli(PLAYER_PED) and not isCharInAnyPlane(PLAYER_PED) then
+				vehptr = getCarPointer(storeCarCharIsInNoSave(PLAYER_PED)) + 1440
+				while strobes and isCharInAnyCar(PLAYER_PED) do
+					-- 0 левая, 1 правая фары, 3 задние
+					callMethod(7086336, vehptr, 2, 0, 0, 0)
+					callMethod(7086336, vehptr, 2, 0, 1, 1)
+					wait(150)
+					callMethod(7086336, vehptr, 2, 0, 0, 1)
+					callMethod(7086336, vehptr, 2, 0, 1, 0)
+					wait(150)
+					if not isCharInAnyCar(PLAYER_PED) then
+						strobes = false
+						break
+					end
+				end
+				callMethod(7086336, vehptr, 2, 0, 0, 0)
+				callMethod(7086336, vehptr, 2, 0, 1, 0)
+	end
+end)
 
 function main()
     if not isSampfuncsLoaded() or not isSampLoaded() then return end
@@ -296,6 +318,7 @@ function main()
     sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
     sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
     sampRegisterChatCommand('woladmin', function() adminfrak.v = true end)
+    sampRegisterChatCommand('wolstrob', function() strobes = not strobes if strobes then strobesfunc:run() end end)
     sampRegisterChatCommand('admins', function() sampSendChat('/admins') adminsimgui.v = true end)
 
     if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
@@ -473,11 +496,13 @@ function SE.onShowDialog(dialogId, style, title, button1, button2, text)
     end
     if title == '{FFFFFF}.:: Way Of Life {FFFFFF}Admins {22FF22}Online ::.' then
         adminlist = {}
+		vsegoadm = 0
         for line in text:gmatch("[^\r\n]+") do
             if line:find('.+%{FFFFFF%}.+%[%d+%].+%(%d+/3%).+%[%d+/3%].+%{22FF22%}%d+') then
                 prefix, admname, admrang, adminawarn, adminowarn, adminid = line:match('(.+)%{FFFFFF%}(.+)%[(%d+)%].+%((%d+)/3%).+%[(%d+)/3%].+%{22FF22%}(%d+)')
 				--adminlist = {prefix = prefix, admname = admname}
                 table.insert(adminlist, {prefix = prefix, admname = admname, admrang = admrang, adminawarn = adminawarn, adminowarn = adminowarn, adminid = adminid})
+				vsegoadm = vsegoadm + 1
             end
         end
 		return false
@@ -1025,8 +1050,8 @@ function imgui.OnDrawFrame()
             imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
             imgui.SetNextWindowSize(imgui.ImVec2(500, 300), imgui.Cond.FirstUseEver)
             imgui.Begin(u8'Админ. функции', adminfrak, imgui.WindowFlags.NoSavedSettings + imgui.WindowFlags.AlwaysAutoResize)
-			if imgui.MenuItem(u8'Использовать /agm') then sampSendChat('/agm') adminfrak.v = false end
-			if imgui.MenuItem(u8'Использовать /offgoto') then sampSendChat('/offgoto') adminfrak.v = false end
+			if imgui.MenuItem(u8'Использовать /agm') then sampSendChat('/agm') end
+			if imgui.MenuItem(u8'Использовать /offgoto') then sampSendChat('/offgoto') end
             if imgui.CollapsingHeader(u8'Функции с фракциями') then
                 for i, v in ipairs(adminfraklist) do
                     if v ~= 'Пустой слот' then
@@ -1063,7 +1088,7 @@ function imgui.OnDrawFrame()
 		if adminsimgui.v then
 			imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 			imgui.SetNextWindowSize(imgui.ImVec2(600, 450), imgui.Cond.FirstUseEver)
-			imgui.Begin(u8'Админы в сети.', adminsimgui, imgui.WindowFlags.NoSavedSettings)
+			imgui.Begin(u8'Админы в сети. Всего админов: ' ..vsegoadm, adminsimgui, imgui.WindowFlags.NoSavedSettings)
 			imgui.Columns(3, _, true)
 			imgui.SetColumnWidth(-1, 220)
 			imgui.Text(u8'Prefix')
@@ -1192,9 +1217,9 @@ function SE.onSetVehicleHealth(vehicleId, health)
 end
 
 function vigovor(arg)
+	local id, prichinaviga = arg:match('(%d+) (.+)')
+	if id == nil or prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', - 1) return end
     lua_thread.create(function()
-        local id, prichinaviga = arg:match('(%d+) (.+)')
-        if id == nil and prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', - 1) return end
         sampSendChat('/vig '..arg)
         wait(1000)
         sampSendChat('/r Сотрудник '..sampGetPlayerNickname(id):gsub('_', ' ')..' получает выговор')
@@ -1204,9 +1229,9 @@ function vigovor(arg)
 end
 
 function uninviteska(arg)
+	local id, prichinaviga = arg:match('(%d+) (.+)')
+	if id == nil or prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', - 1) return end
     lua_thread.create(function()
-        local id, prichinaviga = arg:match('(%d+) (.+)')
-        if id == nil and prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', - 1) return end
         sampSendChat('/uninvite '..arg)
         wait(1000)
         sampSendChat('/r Сотрудник '..sampGetPlayerNickname(id):gsub('_', ' ')..' уволен')
