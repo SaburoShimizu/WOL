@@ -61,6 +61,19 @@ picups = {
     },
 }
 
+alogintextdraw = {
+    [0] = 52,
+    [1] = 53,
+    [2] = 54,
+    [3] = 55,
+    [4] = 56,
+    [5] = 57,
+    [6] = 58,
+    [7] = 59,
+    [8] = 60,
+    [9] = 61,
+}
+
 getgunses = {
     [1] = 100, -- LSPD
     [2] = 99, -- FBI
@@ -158,8 +171,13 @@ local default = {
         aupd = true;
         wolpass = 0;
         wolalogin = false;
+        woladminpass = 0;
+        woladminlogin = false;
         damag = 4;
         showpasswordimgui = false;
+        timesetpos = false,
+        timeposx = 54,
+        timeposy = 302,
     }
 }
 
@@ -172,8 +190,13 @@ local restore = {
         aupd = true;
         wolpass = 0;
         wolalogin = false;
+        woladminpass = 0;
+        woladminlogin = false;
         damag = 4;
         showpasswordimgui = false;
+        timesetpos = false,
+        timeposx = 54,
+        timeposy = 302,
     }
 }
 
@@ -217,10 +240,13 @@ local adminsimgui = imgui.ImBool(false)
 local imguiautogun = imgui.ImBool(wol.autogun)
 local showpasswordimgui = imgui.ImBool(wol.showpasswordimgui)
 local imguimvd = imgui.ImBool(wol.mvd)
+local imguitimes = imgui.ImBool(wol.timesetpos)
 local imguiaupd = imgui.ImBool(wol.aupd)
 local imguiaulog = imgui.ImBool(wol.wolalogin)
 local imguiautoinv = imgui.ImBool(wol.org)
 local imguipass = imgui.ImBuffer(256)
+local imguiadminlogin = imgui.ImBool(wol.woladminlogin)
+local imguiadminpass = imgui.ImBuffer(256)
 local picupid = imgui.ImInt(0)
 local damagersuska = imgui.ImInt(wol.damag)
 local superkillerubizaid = imgui.ImInt(0)
@@ -229,6 +255,7 @@ local wolleadermenu = imgui.ImInt(0)
 local customsendchat = imgui.ImBuffer(1024)
 local imguifile = imgui.ImBuffer(256)
 imguipass.v = wol.wolpass
+imguiadminpass.v = wol.woladminpass
 
 
 local killerrezhim = {
@@ -246,375 +273,388 @@ local govmenu = {
 
 
 strobesfunc = lua_thread.create_suspended(function()
-	if not isCharOnAnyBike(PLAYER_PED) and not isCharInAnyBoat(PLAYER_PED) and not isCharInAnyHeli(PLAYER_PED) and not isCharInAnyPlane(PLAYER_PED) then
-				vehptr = getCarPointer(storeCarCharIsInNoSave(PLAYER_PED)) + 1440
-				while strobes and isCharInAnyCar(PLAYER_PED) do
-					-- 0 левая, 1 правая фары, 3 задние
-					callMethod(7086336, vehptr, 2, 0, 0, 0)
-					callMethod(7086336, vehptr, 2, 0, 1, 1)
-					wait(150)
-					callMethod(7086336, vehptr, 2, 0, 0, 1)
-					callMethod(7086336, vehptr, 2, 0, 1, 0)
-					wait(150)
-					if not isCharInAnyCar(PLAYER_PED) then
-						strobes = false
-						break
-					end
-				end
-				callMethod(7086336, vehptr, 2, 0, 0, 0)
-				callMethod(7086336, vehptr, 2, 0, 1, 0)
-	end
+    if not isCharOnAnyBike(PLAYER_PED) and not isCharInAnyBoat(PLAYER_PED) and not isCharInAnyHeli(PLAYER_PED) and not isCharInAnyPlane(PLAYER_PED) then
+    vehptr = getCarPointer(storeCarCharIsInNoSave(PLAYER_PED)) + 1440
+    while strobes and isCharInAnyCar(PLAYER_PED) do
+        -- 0 левая, 1 правая фары, 3 задние
+        callMethod(7086336, vehptr, 2, 0, 0, 0)
+        callMethod(7086336, vehptr, 2, 0, 1, 1)
+        wait(150)
+        callMethod(7086336, vehptr, 2, 0, 0, 1)
+        callMethod(7086336, vehptr, 2, 0, 1, 0)
+        wait(150)
+        if not isCharInAnyCar(PLAYER_PED) then
+            strobes = false
+            break
+        end
+    end
+    callMethod(7086336, vehptr, 2, 0, 0, 0)
+    callMethod(7086336, vehptr, 2, 0, 1, 0)
+end
 end)
 
 function main()
-    if not isSampfuncsLoaded() or not isSampLoaded() then return end
-    while not isSampAvailable() do wait(100) end
-    local ip = sampGetCurrentServerAddress()
+if not isSampfuncsLoaded() or not isSampLoaded() then return end
+while not isSampAvailable() do wait(100) end
+local ip = sampGetCurrentServerAddress()
 
-    if ip:find('176.32.36.103') or ip:find('176.32.39.159') then activ = true sampAddChatMessage('{FF0000}WolHelper {FFFFFF}для {00FF00}Way Of Life и After Life {01A0E9}загружен', - 1) sampAddChatMessage(teg ..'/wolhelp - команды скрипта. Версия скрипта: {d5dedd}' ..thisScript().version, - 1) sampAddChatMessage(teg ..'Если ваша статистика не была проверена автоматически введите {FF7000}/getstat', - 1) if wol.mvd then if script.find('MVDhelper Era') then script.find('MVDhelper Era'):unload() end end else thisScript():unload() end
+if ip:find('176.32.36.103') or ip:find('176.32.39.159') then activ = true sampAddChatMessage('{FF0000}WolHelper {FFFFFF}для {00FF00}Way Of Life и After Life {01A0E9}загружен', - 1) sampAddChatMessage(teg ..'/wolhelp - команды скрипта. Версия скрипта: {d5dedd}' ..thisScript().version, - 1) sampAddChatMessage(teg ..'Если ваша статистика не была проверена автоматически введите {FF7000}/getstat', - 1) if wol.mvd then if script.find('MVDhelper Era') then script.find('MVDhelper Era'):unload() end end else thisScript():unload() end
 
-    if script.find('PrisonHelper.lua') then script.find('PrisonHelper.lua'):unload() end
-    if aupd == true then apdeit() end
-    if not doesDirectoryExist(getWorkingDirectory() ..'/WolHelper') then
-        createDirectory(getWorkingDirectory() ..'/WolHelper')
-        local file = io.open(getWorkingDirectory() ..'/WolHelper/начало_собеса.txt', 'w+')
-        file:close()
-        local file = io.open(getWorkingDirectory() ..'/WolHelper/конец_собеса.txt', 'w+')
-        file:close()
-        local file = io.open(getWorkingDirectory() ..'/WolHelper/первая_напоминалка_собеса.txt', 'w+')
-        file:close()
-        local file = io.open(getWorkingDirectory() ..'/WolHelper/вторая_напоминалка_собеса.txt', 'w+')
-        file:close()
-    end
-    if not doesDirectoryExist(getWorkingDirectory() ..'/WolHelper/Binder/') then
-        createDirectory(getWorkingDirectory() ..'/WolHelper/Binder/')
-        local file = io.open(getWorkingDirectory() ..'/WolHelper/Binder/Info.txt', 'w+')
-        file:write('Введите текст\nДля установки задержки используйте wait(время в мс) в новой строчке\nПример:\n/me достал Desert Eagle\nwait(1000)\n/me снял предохранитель')
-        file:close()
-    end
-    --imgui.Process = true
-    sampRegisterChatCommand('swatgun', function(nambs) if nambs == '1' or nambs == '0' then naambs = nambs else sampAddChatMessage(teg ..'Вы введи неправильно команду. {FF7000}/swatgun [0-1]', - 1) end end)
-    sampRegisterChatCommand('wolgun', wolgun)
-    --sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
-    sampRegisterChatCommand('getjob', function() sampSendPickedUpPickup(168) end)
-    sampRegisterChatCommand('getstat', function() getstat = true sampSendChat('/mm') end)
-    sampRegisterChatCommand('wolhelp', function() imguifaq.v = true end)
-    sampRegisterChatCommand('wolreload', function() thisScript():reload() end)
-    sampRegisterChatCommand('wolmenu', function() scriptmenu.v = true end)
-    sampRegisterChatCommand('woltp', function(res) if res:find('%d+') then sampSendChat('/find '..res) tpfindresult = true else tporg.v = true end end)
-    sampRegisterChatCommand('woldamag', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', - 1) return else sampSendGiveDamage(id, 49, 24, 9) end end)
-    sampRegisterChatCommand('wolsu', function(id) sampSendTakeDamage(id, 49, 24, 9) end)
-    sampRegisterChatCommand('woldamags', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', - 1) return else lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
-    sampRegisterChatCommand('woldamager', damagerblyt)
-    sampRegisterChatCommand('wolpomeha', pomehaska)
-    sampRegisterChatCommand('wolcarhp', wolcarhp)
-    sampRegisterChatCommand('wolarmor', wolarmor)
-    sampRegisterChatCommand('vig', vigovor)
-    sampRegisterChatCommand('ф', function(args) if #args > 0 then sampSendChat('/a '..args) end end)
-    sampRegisterChatCommand('щ', function(args) if #args > 0 then sampSendChat('/o '..args) end end)
-    sampRegisterChatCommand('uninvite', uninviteska)
-    sampRegisterChatCommand('wolstroy', function() sampSendChat('/members') trenirovkaimgui.v = true end)
-    sampRegisterChatCommand('suninvite', function(arg) sampSendChat('/uninvite '..arg) end)
-    sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
-    sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
-    sampRegisterChatCommand('woladmin', function() adminfrak.v = true end)
-    sampRegisterChatCommand('wolstrob', function() strobes = not strobes if strobes then strobesfunc:run() end end)
-    sampRegisterChatCommand('admins', function() sampSendChat('/admins') adminsimgui.v = true end)
+if script.find('PrisonHelper.lua') then script.find('PrisonHelper.lua'):unload() end
+if aupd == true then apdeit() end
+if not doesDirectoryExist(getWorkingDirectory() ..'/WolHelper') then
+    createDirectory(getWorkingDirectory() ..'/WolHelper')
+    local file = io.open(getWorkingDirectory() ..'/WolHelper/начало_собеса.txt', 'w+')
+    file:close()
+    local file = io.open(getWorkingDirectory() ..'/WolHelper/конец_собеса.txt', 'w+')
+    file:close()
+    local file = io.open(getWorkingDirectory() ..'/WolHelper/первая_напоминалка_собеса.txt', 'w+')
+    file:close()
+    local file = io.open(getWorkingDirectory() ..'/WolHelper/вторая_напоминалка_собеса.txt', 'w+')
+    file:close()
+end
+if not doesDirectoryExist(getWorkingDirectory() ..'/WolHelper/Binder/') then
+    createDirectory(getWorkingDirectory() ..'/WolHelper/Binder/')
+    local file = io.open(getWorkingDirectory() ..'/WolHelper/Binder/Info.txt', 'w+')
+    file:write('Введите текст\nДля установки задержки используйте wait(время в мс) в новой строчке\nПример:\n/me достал Desert Eagle\nwait(1000)\n/me снял предохранитель')
+    file:close()
+end
+--imgui.Process = true
+sampRegisterChatCommand('swatgun', function(nambs) if nambs == '1' or nambs == '0' then naambs = nambs else sampAddChatMessage(teg ..'Вы введи неправильно команду. {FF7000}/swatgun [0-1]', - 1) end end)
+sampRegisterChatCommand('wolgun', wolgun)
+--sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
+sampRegisterChatCommand('getjob', function() sampSendPickedUpPickup(168) end)
+sampRegisterChatCommand('getstat', function() getstat = true sampSendChat('/mm') end)
+sampRegisterChatCommand('wolhelp', function() imguifaq.v = true end)
+sampRegisterChatCommand('wolreload', function() thisScript():reload() end)
+sampRegisterChatCommand('wolmenu', function() scriptmenu.v = true end)
+sampRegisterChatCommand('woltp', function(res) if res:find('%d+') then sampSendChat('/find '..res) tpfindresult = true else tporg.v = true end end)
+sampRegisterChatCommand('woldamag', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', - 1) return else sampSendGiveDamage(id, 49, 24, 9) end end)
+sampRegisterChatCommand('wolsu', function(id) sampSendTakeDamage(id, 49, 24, 9) end)
+sampRegisterChatCommand('woldamags', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', - 1) return else lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
+sampRegisterChatCommand('woldamager', damagerblyt)
+sampRegisterChatCommand('wolpomeha', pomehaska)
+sampRegisterChatCommand('wolcarhp', wolcarhp)
+sampRegisterChatCommand('wolarmor', wolarmor)
+sampRegisterChatCommand('vig', vigovor)
+sampRegisterChatCommand('ф', function(args) if #args > 0 then sampSendChat('/a '..args) end end)
+sampRegisterChatCommand('щ', function(args) if #args > 0 then sampSendChat('/o '..args) end end)
+sampRegisterChatCommand('uninvite', uninviteska)
+sampRegisterChatCommand('wolstroy', function() sampSendChat('/members') trenirovkaimgui.v = true end)
+sampRegisterChatCommand('suninvite', function(arg) sampSendChat('/uninvite '..arg) end)
+sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
+sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
+sampRegisterChatCommand('woladmin', function() adminfrak.v = true end)
+sampRegisterChatCommand('wolstrob', function() strobes = not strobes if strobes then strobesfunc:run() end end)
+sampRegisterChatCommand('admins', function() sampSendChat('/admins') adminsimgui.v = true end)
+--sampRegisterChatCommand('wolsetpostime', setpostimefunc)
 
-    if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
+if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
 
 
-    rkeys.registerHotKey({vkeys.VK_MENU, vkeys.VK_1}, true, function() if not superkillerubiza.v then superkillerubiza.v = true end end)
-    rkeys.registerHotKey({vkeys.VK_RETURN}, true, function()
-        if findimgui.v then findimgui.v = false end
-        if adminsimgui.v then adminsimgui.v = false end
-        if trenirovkaimgui.v then trenirovkaimgui.v = false end
-        if superkillerubiza.v then
-            if superkillerubizarezhim.v == 0 then
-                lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) wait(90) end end)
-            end
-            if superkillerubizarezhim.v == 1 then pomehaska(tostring(superkillerubizaid.v)) end
-            if superkillerubizarezhim.v == 2 then sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) end
+rkeys.registerHotKey({vkeys.VK_MENU, vkeys.VK_1}, true, function() if not superkillerubiza.v then superkillerubiza.v = true end end)
+rkeys.registerHotKey({vkeys.VK_RETURN}, true, function()
+    if findimgui.v then findimgui.v = false end
+    if adminsimgui.v then adminsimgui.v = false end
+    if trenirovkaimgui.v then trenirovkaimgui.v = false end
+    if superkillerubiza.v then
+        if superkillerubizarezhim.v == 0 then
+            lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) wait(90) end end)
         end
-    end)
+        if superkillerubizarezhim.v == 1 then pomehaska(tostring(superkillerubizaid.v)) end
+        if superkillerubizarezhim.v == 2 then sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) end
+    end
+end)
 
-    imgui.Process = true
+imgui.Process = true
 
-    showCursor(false, false)
+showCursor(false, false)
 
-    while true do
-        --imgui.Process = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v
-        -- LOAD PARAMS
-        wol = ini.WOL
-        aupd = wol.aupd
-        adownload = wol.adownload
-        org = wol.org
-        hide = wol.hide
-        autogun = wol.autogun
-        mvd = wol.mvd
-        gun = wol.gun
-        wolpass = wol.wolpass
-        wolalogin = wol.wolalogin
+if wol.timesetpos then
+    local timedata = 's'
+    local timeclock = 's'
+    lua_thread.create(function()
+        while wol.timesetpos do
+        sampTextdrawSetPos(16, wol.timeposx, wol.timeposy)
+        sampTextdrawSetPos(17, wol.timeposx - 9, wol.timeposy + 20)
         wait(0)
     end
+end)
+end
+while true do
+--imgui.Process = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v
+-- LOAD PARAMS
+wol = ini.WOL
+aupd = wol.aupd
+adownload = wol.adownload
+org = wol.org
+hide = wol.hide
+autogun = wol.autogun
+mvd = wol.mvd
+gun = wol.gun
+wolpass = wol.wolpass
+wolalogin = wol.wolalogin
+wait(0)
+end
 end
 
 function checkmenu()
-    local my_dialoges = {
-        {
-            title = string.format('My stat: %s', stat and 'Вкл' or 'Выкл')
-        }
-    }
+local my_dialoges = {
+{
+    title = string.format('My stat: %s', stat and 'Вкл' or 'Выкл')
+}
+}
 end
 
 function menu()
-    checkmenu()
-    submenus_show(my_dialoges, 'Ebat', 'Ok', 'Ne ok!', 'Nozad')
-    if stat == false then stat = true else stat = false end
+checkmenu()
+submenus_show(my_dialoges, 'Ebat', 'Ok', 'Ne ok!', 'Nozad')
+if stat == false then stat = true else stat = false end
 end
 
 
 function pickupid(model)
-    local poolPtr = sampGetPickupPoolPtr()
-    local ptwo = readMemory(poolPtr, 4, 0)
-    if ptwo > 0 then
-        ptwo = poolPtr + 0x4
-        local pthree = poolPtr + 0xF004
-        for id = 1, 4096 do
-            local pfive = readMemory(ptwo + id * 4, 4, false)
-            if pfive < 0 or pfive > 0 then
-                pfive = readMemory(pthree + id * 20, 4, false)
-                if pfive == 353 then
-                    return id
-                end
-            end
+local poolPtr = sampGetPickupPoolPtr()
+local ptwo = readMemory(poolPtr, 4, 0)
+if ptwo > 0 then
+ptwo = poolPtr + 0x4
+local pthree = poolPtr + 0xF004
+for id = 1, 4096 do
+    local pfive = readMemory(ptwo + id * 4, 4, false)
+    if pfive < 0 or pfive > 0 then
+        pfive = readMemory(pthree + id * 20, 4, false)
+        if pfive == 353 then
+            return id
         end
     end
+end
+end
 end
 
 
 
 function getorg(orges)
-    if orges:find('LSPD') then return 1 end
-    if orges:find('FBI') then return 2 end
-    if orges:find('S.W.A.T') then return 3 end
-    if orges:find('ВВС') then return 4 end
-    if orges:find('Army LV') then return 5 end
-    if orges:find('Army SF') then return 6 end
-    if orges:find('Мэрия') then return 7 end
-    if orges:find('Правительство') then return 8 end
-    if orges:find('Hitmans') then return 9 end
-    if orges:find('Ballas Gang') then return 10 end
-    if orges:find('Vagos Gang') then return 11 end
-    if orges:find('Grove Street Gang') then return 12 end
-    if orges:find('Aztecas Gang') then return 13 end
-    if orges:find('Rifa Gang') then return 14 end
+if orges:find('LSPD') then return 1 end
+if orges:find('FBI') then return 2 end
+if orges:find('S.W.A.T') then return 3 end
+if orges:find('ВВС') then return 4 end
+if orges:find('Army LV') then return 5 end
+if orges:find('Army SF') then return 6 end
+if orges:find('Мэрия') then return 7 end
+if orges:find('Правительство') then return 8 end
+if orges:find('Hitmans') then return 9 end
+if orges:find('Ballas Gang') then return 10 end
+if orges:find('Vagos Gang') then return 11 end
+if orges:find('Grove Street Gang') then return 12 end
+if orges:find('Aztecas Gang') then return 13 end
+if orges:find('Rifa Gang') then return 14 end
 end
 
 
 function SE.onServerMessage(color, text)
-    if text:find('.+Вы успешно авторизовались!') then getstat = true sampSendChat('/mm') end
-    if text:find('Выдано:   Дубинка') and swatgun then return false end
-    --if re.match(text, 's <- {.+} / . s') then sampAddChatMessage(text, -1) end
-    if text:find('Члены организации Online') or text:find('Члены организации %{FFFFFF%}№.+ %{059BD3%}Online:') then findshowtable, vstroy, nevstroy, ryadom = {}, {}, {}, {} findshow = true return false end
-    if findshow and text:find('ранг') then
-        local id, nick, rang = text:match('%[(%d+)%] (%a+_%a+) ранг: (.+) ')
-        if id == nil or rang == nil then sampAddChatMessage(teg ..'Произошла ошибка. Ник: '..nick, - 1) return end
-        local name = nick ..' ['..id..']' findshowtable[name] = rang
-        local result, ped = sampGetCharHandleBySampPlayerId(id)
-        local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
-        if doesCharExist(ped) then
-            local x, y, z = getCharCoordinates(ped)
-            local mx, my, mz = getCharCoordinates(PLAYER_PED)
-            local dist = getDistanceBetweenCoords3d(mx, my, mz, x, y, z)
+if text:find('Чтобы войти в админку введите /alogin') and wol.woladminlogin then adminloginfunc() end
+if text:find('.+Вы успешно авторизовались!') then getstat = true sampSendChat('/mm') end
+if text:find('Выдано:   Дубинка') and swatgun then return false end
+--if re.match(text, 's <- {.+} / . s') then sampAddChatMessage(text, -1) end
+if text:find('Члены организации Online') or text:find('Члены организации %{FFFFFF%}№.+ %{059BD3%}Online:') then findshowtable, vstroy, nevstroy, ryadom = {}, {}, {}, {} findshow = true return false end
+if findshow and text:find('ранг') then
+local id, nick, rang = text:match('%[(%d+)%] (%a+_%a+) ранг: (.+) ')
+if id == nil or rang == nil then sampAddChatMessage(teg ..'Произошла ошибка. Ник: '..nick, - 1) return end
+local name = nick ..' ['..id..']' findshowtable[name] = rang
+local result, ped = sampGetCharHandleBySampPlayerId(id)
+local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
+if doesCharExist(ped) then
+    local x, y, z = getCharCoordinates(ped)
+    local mx, my, mz = getCharCoordinates(PLAYER_PED)
+    local dist = getDistanceBetweenCoords3d(mx, my, mz, x, y, z)
 
-            if dist <= 25 then
-                vstroy[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
-            else
-                ryadom[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
-            end
-        else
-            if tonumber(id) == myid then nevstroy[name ..' <<<'] = rang return false end
-            nevstroy[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
-        end
-        return false
+    if dist <= 25 then
+        vstroy[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
+    else
+        ryadom[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
     end
-    if text:find('Всего: %d+ человек') then
-        findkolvo = text:match('Всего: (%d+) человек')
-        findshow = false
-        return false
-    end
+else
+    if tonumber(id) == myid then nevstroy[name ..' <<<'] = rang return false end
+    nevstroy[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
+end
+return false
+end
+if text:find('Всего: %d+ человек') then
+findkolvo = text:match('Всего: (%d+) человек')
+findshow = false
+return false
+end
 end
 
 function SE.onShowDialog(dialogId, style, title, button1, button2, text)
-    if wolalogin == true then
-        if title == '{AEFFFF}Авторизация' then
-            if text:find('.+Попыток: %d+ из %d+.+') then
-                sampAddChatMessage(teg ..'Вы ввели неправильно пароль. Для смены пароля введите /wolpass', - 1)
-            else
-                sampSendDialogResponse(dialogId, 1, - 1, wolpass)
-            end
-        end
+if wolalogin == true then
+if title == '{AEFFFF}Авторизация' then
+    if text:find('.+Попыток: %d+ из %d+.+') then
+        sampAddChatMessage(teg ..'Вы ввели неправильно пароль. Для смены пароля введите /wolpass', - 1)
+    else
+        sampSendDialogResponse(dialogId, 1, - 1, wolpass)
     end
-    if activ then
-        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№1' then sampSendDialogResponse(dialogId, 1, - 1, '2') end
-        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№2' then sampSendDialogResponse(dialogId, 1, - 1, '4') end
-        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№3' then sampSendDialogResponse(dialogId, 1, - 1, '1') end
-        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№4' then sampSendDialogResponse(dialogId, 1, - 1, '1') end
-        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№5' then sampSendDialogResponse(dialogId, 1, - 1, '3') end
-        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№6' then sampSendDialogResponse(dialogId, 1, - 1, '2') end
-        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№7' then sampSendDialogResponse(dialogId, 1, - 1, '4') lua_thread.create(function() wait(500) getstat = true sampSendChat('/mm') end) end
+end
+end
+if activ then
+if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№1' then sampSendDialogResponse(dialogId, 1, - 1, '2') end
+if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№2' then sampSendDialogResponse(dialogId, 1, - 1, '4') end
+if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№3' then sampSendDialogResponse(dialogId, 1, - 1, '1') end
+if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№4' then sampSendDialogResponse(dialogId, 1, - 1, '1') end
+if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№5' then sampSendDialogResponse(dialogId, 1, - 1, '3') end
+if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№6' then sampSendDialogResponse(dialogId, 1, - 1, '2') end
+if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№7' then sampSendDialogResponse(dialogId, 1, - 1, '4') lua_thread.create(function() wait(500) getstat = true sampSendChat('/mm') end) end
+end
+if getstat == true then
+if title:find('{AEFFFF}Игровой уровень: %d+ | Очки опыта: %d+ из %d+') then
+    sampSendDialogResponse(5051, 1, 0, _)
+    return false
+end
+if title:find('{33AA33}Статистика игрового аккаунта:{ffffff} .+') then
+    warn = text:match('.+(%d+)/.+Уровень Преступлений:.+')
+    orges = text:match('.+Организация:.+%{ffffff}(.+)Ранг:.+')
+    orgs = getorg(orges)
+    getstat = false
+    if warn ~= '0' then sampAddChatMessage(teg ..'Ваша организация: '..orges, - 1) sampAddChatMessage(teg ..'На вашем аккаунте имеется {FF7000}' ..warn ..' {FFFFFF}варн(а). Рекомендуем снять для избежания бана!', - 1) return false
+    else
+        sampAddChatMessage(teg ..'Ваш аккаунт чист. Ваша организация: '..orges ..'.', - 1)
+        return false
     end
-    if getstat == true then
-        if title:find('{AEFFFF}Игровой уровень: %d+ | Очки опыта: %d+ из %d+') then
-            sampSendDialogResponse(5051, 1, 0, _)
-            return false
-        end
-        if title:find('{33AA33}Статистика игрового аккаунта:{ffffff} .+') then
-            warn = text:match('.+(%d+)/.+Уровень Преступлений:.+')
-            orges = text:match('.+Организация:.+%{ffffff}(.+)Ранг:.+')
-            orgs = getorg(orges)
-            getstat = false
-            if warn ~= '0' then sampAddChatMessage(teg ..'Ваша организация: '..orges, - 1) sampAddChatMessage(teg ..'На вашем аккаунте имеется {FF7000}' ..warn ..' {FFFFFF}варн(а). Рекомендуем снять для избежания бана!', - 1) return false
-            else
-                sampAddChatMessage(teg ..'Ваш аккаунт чист. Ваша организация: '..orges ..'.', - 1)
-                return false
-            end
-        end
+end
+end
+if swatgun == true then
+if title == 'Комплекты « SWAT » San Andreas' then for i = 0, gun * 4 do sampSendDialogResponse(dialogId, tonumber(naambs), - 1, - 1) end lua_thread.create(function() wait(10000) swatgun = false end) end
+end
+if autogun == true and title:find('Набор.+') and dialogId == 5051 then
+sampSendDialogResponse(dialogId, 1, 0, 1)
+for i = 0, gun do
+    sampSendDialogResponse(dialogId, 1, 3, 1)
+    sampSendDialogResponse(dialogId, 1, 4, 1)
+    sampSendDialogResponse(dialogId, 1, 5, 1)
+    sampSendDialogResponse(dialogId, 1, 6, 1)
+end
+end
+if title == '{FFFFFF}.:: Way Of Life {FFFFFF}Admins {22FF22}Online ::.' then
+adminlist = {}
+vsegoadm = 0
+for line in text:gmatch("[^\r\n]+") do
+    if line:find('.+%{FFFFFF%}.+%[%d+%].+%(%d+/3%).+%[%d+/3%].+%{22FF22%}%d+') then
+        prefix, admname, admrang, adminawarn, adminowarn, adminid = line:match('(.+)%{FFFFFF%}(.+)%[(%d+)%].+%((%d+)/3%).+%[(%d+)/3%].+%{22FF22%}(%d+)')
+        --adminlist = {prefix = prefix, admname = admname}
+        table.insert(adminlist, {prefix = prefix, admname = admname, admrang = admrang, adminawarn = adminawarn, adminowarn = adminowarn, adminid = adminid})
+        vsegoadm = vsegoadm + 1
     end
-    if swatgun == true then
-        if title == 'Комплекты « SWAT » San Andreas' then for i = 0, gun * 4 do sampSendDialogResponse(dialogId, tonumber(naambs), - 1, - 1) end lua_thread.create(function() wait(10000) swatgun = false end) end
-    end
-    if autogun == true and title:find('Набор.+') and dialogId == 5051 then
-        sampSendDialogResponse(dialogId, 1, 0, 1)
-        for i = 0, gun do
-            sampSendDialogResponse(dialogId, 1, 3, 1)
-            sampSendDialogResponse(dialogId, 1, 4, 1)
-            sampSendDialogResponse(dialogId, 1, 5, 1)
-            sampSendDialogResponse(dialogId, 1, 6, 1)
-        end
-    end
-    if title == '{FFFFFF}.:: Way Of Life {FFFFFF}Admins {22FF22}Online ::.' then
-        adminlist = {}
-		vsegoadm = 0
-        for line in text:gmatch("[^\r\n]+") do
-            if line:find('.+%{FFFFFF%}.+%[%d+%].+%(%d+/3%).+%[%d+/3%].+%{22FF22%}%d+') then
-                prefix, admname, admrang, adminawarn, adminowarn, adminid = line:match('(.+)%{FFFFFF%}(.+)%[(%d+)%].+%((%d+)/3%).+%[(%d+)/3%].+%{22FF22%}(%d+)')
-				--adminlist = {prefix = prefix, admname = admname}
-                table.insert(adminlist, {prefix = prefix, admname = admname, admrang = admrang, adminawarn = adminawarn, adminowarn = adminowarn, adminid = adminid})
-				vsegoadm = vsegoadm + 1
-            end
-        end
-		return false
-    end
+end
+return false
+end
 end
 
 
 
 function wolgun()
-    lua_thread.create(function()
-        if orgs == nil then getstat = true sampSendChat('/mm') end
-        while orgs == nil do wait(0) end
-        if orgs < 9 and orgs ~= 3 then
-            sampSendPickedUpPickup(getgunses[orgs])
-        elseif orgs == 9 then
-            hitmangun()
-        elseif orgs == 3 then
-            swatgun = true sampSendPickedUpPickup(getgunses[orgs])
-        elseif orgs >= 10 then
-            ganggun(orgs)
-        end
-    end)
+lua_thread.create(function()
+if orgs == nil then getstat = true sampSendChat('/mm') end
+while orgs == nil do wait(0) end
+if orgs < 9 and orgs ~= 3 then
+    sampSendPickedUpPickup(getgunses[orgs])
+elseif orgs == 9 then
+    hitmangun()
+elseif orgs == 3 then
+    swatgun = true sampSendPickedUpPickup(getgunses[orgs])
+elseif orgs >= 10 then
+    ganggun(orgs)
+end
+end)
 end
 
 function damagerblyt(nid)
-    local nekill = nil
-    if nid:find('%d+') then nekill = tonumber(nid) end
-    lua_thread.create(function()
-        local peds = getAllChars()
-        for i = 0, #peds do
-            local _, id = sampGetPlayerIdByCharHandle(peds[i])
-            local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
-            local result = sampIsPlayerPaused(id)
-            if nekill == nil then nekill = myid end
-            if not result and id ~= myid and id ~= nekill then
-                for z = 0, wol.damag do
-                    sampSendGiveDamage(id, 49, 24, 9)
-                    wait(90)
-                end
-                wait(200)
-            end
+local nekill = nil
+if nid:find('%d+') then nekill = tonumber(nid) end
+lua_thread.create(function()
+local peds = getAllChars()
+for i = 0, #peds do
+    local _, id = sampGetPlayerIdByCharHandle(peds[i])
+    local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
+    local result = sampIsPlayerPaused(id)
+    if nekill == nil then nekill = myid end
+    if not result and id ~= myid and id ~= nekill then
+        for z = 0, wol.damag do
+            sampSendGiveDamage(id, 49, 24, 9)
+            wait(90)
         end
-        notf.addNotification('Дамагер выключен', 5, 2)
-    end)
+        wait(200)
+    end
+end
+notf.addNotification('Дамагер выключен', 5, 2)
+end)
 end
 
 function pomehaska(id)
-    if not id:find('%d+') then
-        notf.addNotification('WolHelper\n\nОшибка. Используйте /wolpomeha ID', 5, 3)
-        return
+if not id:find('%d+') then
+notf.addNotification('WolHelper\n\nОшибка. Используйте /wolpomeha ID', 5, 3)
+return
+end
+--sampAddChatMessage(teg ..'Не правильно введён ID', -1) return end
+local name = sampGetPlayerNickname(id)
+if dmg ~= true then
+lua_thread.create(function()
+    dmg = true
+    --sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] включён', - 1)
+    notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] включён', 5, 1)
+    local con = sampIsPlayerConnected(id)
+    while dmg and con do
+        con = sampIsPlayerConnected(id)
+        sampSendGiveDamage(id, 49, 24, 9)
+        wait(0)
     end
-    --sampAddChatMessage(teg ..'Не правильно введён ID', -1) return end
-    local name = sampGetPlayerNickname(id)
-    if dmg ~= true then
-        lua_thread.create(function()
-            dmg = true
-            --sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] включён', - 1)
-            notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] включён', 5, 1)
-            local con = sampIsPlayerConnected(id)
-            while dmg and con do
-                con = sampIsPlayerConnected(id)
-                sampSendGiveDamage(id, 49, 24, 9)
-                wait(0)
-            end
-            dmg = false
-            if not con then
-                --sampAddChatMessage(teg ..'Убиватор выключен. Жертва оффнулась', -1)
-                notf.addNotification('WolHelper\n\nУбиватор выключен. Жертва оффнулась', 5, 1)
-            end
-        end)
-    else
-        dmg = false
-        --sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] выключен', - 1)
-        notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] выключен', 5, 1)
+    dmg = false
+    if not con then
+        --sampAddChatMessage(teg ..'Убиватор выключен. Жертва оффнулась', -1)
+        notf.addNotification('WolHelper\n\nУбиватор выключен. Жертва оффнулась', 5, 1)
     end
+end)
+else
+dmg = false
+--sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] выключен', - 1)
+notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] выключен', 5, 1)
+end
 end
 
 
 --ОБНОВА
 
 function apdeit()
-    async_http_request('GET', 'https://raw.githubusercontent.com/SaburoShimizu/WOL/master/WOLVER', nil --[[параметры запроса]],
-        function(resp) -- вызовется при успешном выполнении и получении ответа
-            local suk = resp.text
-            newvers = suk:match('Version = (.+), URL.+') if newvers > thisScript().version then sampAddChatMessage(teg ..'Обнаружено обновление до v.{FF0000}'..newvers ..'{01A0E9}. Для обновления используйте /wolmenu', - 1) elseif newvers == thisScript().version then sampAddChatMessage(teg..'У вас актуальная версия скрипта.', - 1) elseif newvers < thisScript().version then sampAddChatMessage(teg..'У вас тестовая версия скрипта.', - 1) end
-            print('Проверка обновления')
-        end,
-        function(err) -- вызовется при ошибке, err - текст ошибки. эту функцию можно не указывать
-            print(err)
-            sampAddChatMessage(teg ..'Ошибка поиска версии. Попробуйте позже.', - 1)
-    end)
+async_http_request('GET', 'https://raw.githubusercontent.com/SaburoShimizu/WOL/master/WOLVER', nil --[[параметры запроса]],
+function(resp) -- вызовется при успешном выполнении и получении ответа
+    local suk = resp.text
+    newvers = suk:match('Version = (.+), URL.+') if newvers > thisScript().version then sampAddChatMessage(teg ..'Обнаружено обновление до v.{FF0000}'..newvers ..'{01A0E9}. Для обновления используйте /wolmenu', - 1) elseif newvers == thisScript().version then sampAddChatMessage(teg..'У вас актуальная версия скрипта.', - 1) elseif newvers < thisScript().version then sampAddChatMessage(teg..'У вас тестовая версия скрипта.', - 1) end
+    print('Проверка обновления')
+end,
+function(err) -- вызовется при ошибке, err - текст ошибки. эту функцию можно не указывать
+    print(err)
+    sampAddChatMessage(teg ..'Ошибка поиска версии. Попробуйте позже.', - 1)
+end)
 end
 
 
 
 function updates()
-    async_http_request('GET', 'https://raw.githubusercontent.com/SaburoShimizu/WOL/master/WolHelper.lua', nil --[[параметры запроса]],
-        function(respe) -- вызовется при успешном выполнении и получении ответа
-            if #respe.text > 0 then
-                f = io.open(getWorkingDirectory() ..'/WolHelper.lua', 'wb')
-                f:write(u8:decode(respe.text))
-                f:close()
-                sampAddChatMessage(teg ..'Обновление успешно скачалось. Скрипт перезапуститься автоматически', - 1)
-                thisScript():reload()
-            else
-                sampAddChatMessage(teg ..'Ошибка обновления. Попробуйте позже', - 3)
-            end
-            print('Установка обновления скрипта')
-        end,
-        function(err) -- вызовется при ошибке, err - текст ошибки. эту функцию можно не указывать
-            print(err)
-            sampAddChatMessage(teg ..'Ошибка обновления. Попробуйте позже.', - 1)
+async_http_request('GET', 'https://raw.githubusercontent.com/SaburoShimizu/WOL/master/WolHelper.lua', nil --[[параметры запроса]],
+    function(respe) -- вызовется при успешном выполнении и получении ответа
+        if #respe.text > 0 then
+            f = io.open(getWorkingDirectory() ..'/WolHelper.lua', 'wb')
+            f:write(u8:decode(respe.text))
+            f:close()
+            sampAddChatMessage(teg ..'Обновление успешно скачалось. Скрипт перезапуститься автоматически', - 1)
+            thisScript():reload()
+        else
+            sampAddChatMessage(teg ..'Ошибка обновления. Попробуйте позже', - 3)
+        end
+        print('Установка обновления скрипта')
+    end,
+    function(err) -- вызовется при ошибке, err - текст ошибки. эту функцию можно не указывать
+        print(err)
+        sampAddChatMessage(teg ..'Ошибка обновления. Попробуйте позже.', - 1)
     end)
 end
 
@@ -700,11 +740,16 @@ function imgui.OnDrawFrame()
             imgui.SameLine(365)
             imadd.ToggleButton('mvd##6', imguimvd)
             wol.mvd = imguimvd.v
+            imgui.Text(u8'Смена позиции часов')
+            imgui.SameLine(365)
+            imadd.ToggleButton('times##111', imguitimes)
+            wol.timesetpos = imguitimes.v
             imgui.Text(u8'Автологин')
             imgui.SameLine(365)
             imadd.ToggleButton('alogin##6', imguiaulog)
             wol.wolalogin = imguiaulog.v
             if imguiaulog.v then
+                imgui.Separator()
                 imgui.Text(u8'Показывать пароль'); ShowHelpMarker('Если выключен - скрывает пароль ***')
                 imgui.SameLine(365)
                 imadd.ToggleButton('aloginshow##6', showpasswordimgui)
@@ -715,6 +760,18 @@ function imgui.OnDrawFrame()
                     imgui.InputText(u8'Введите пароль', imguipass, imgui.InputTextFlags.Password)
                 end
                 wol.wolpass = u8:decode(imguipass.v)
+                imgui.Separator()
+            end
+            imgui.Text(u8'Авто /alogin')
+            imgui.SameLine(365)
+            imadd.ToggleButton('admlogin##6', imguiadminlogin)
+            wol.woladminlogin = imguiadminlogin.v
+            if imguiadminlogin.v then
+                imgui.Separator()
+                imgui.InputText(u8'Введите админ пароль', imguiadminpass)
+                imgui.Text(u8'Текущий пароль: '..wol.woladminpass)
+                wol.woladminpass = u8:decode(imguiadminpass.v)
+                imgui.Separator()
             end
             imgui.Spacing()
             imgui.Separator()
@@ -989,255 +1046,283 @@ function imgui.OnDrawFrame()
                                     sampSendChat(line)
                                 end
                             end
-                    end)
-                end
-            end
-            if imgui.CollapsingHeader(u8'Постоянные отыгровки') then
-                imgui.Text(u8'Введите название файла.')
-                imgui.InputText(u8'.txt', imguifile)
-
-                if doesFileExist('moonloader/WolHelper/Binder/'..imguifile.v..'.txt') then
-                    if imgui.MenuItem(u8'Обновить информацию') then
-                        local filesource = io.open('moonloader/WolHelper/Binder/'..imguifile.v..'.txt', 'a+')
-                        customsendchat.v = filesource:read('*a')
-                        filesource:close()
-                    end
-                    imgui.PushItemWidth(500)
-                    imgui.InputTextMultiline('##svoihui', customsendchat)
-                    imgui.PushItemWidth()
-
-                    if imgui.Button(u8'Активировать', imgui.ImVec2(245, 0)) then
-                        lua_thread.create(
-                            function()
-                                for line in u8:decode(customsendchat.v):gmatch("[^\r\n]+") do
-                                    if line:find('wait%(%d+%)') then local waittime = line:match('wait%((%d+)%)') wait(waittime)
-                                    else
-                                        sampSendChat(line)
-                                    end
-                                end
                         end)
                     end
-                    imgui.SameLine()
-                    if imgui.Button(u8'Взаимодействие', imgui.ImVec2(250, 0)) then
-                        imgui.OpenPopup('VzaimFile')
-                    end
+                end
+                if imgui.CollapsingHeader(u8'Постоянные отыгровки') then
+                    imgui.Text(u8'Введите название файла.')
+                    imgui.InputText(u8'.txt', imguifile)
 
-                    if imgui.BeginPopup('VzaimFile') then
-                        if imgui.MenuItem(u8'Сохранить файл') then
-                            local filesource = io.open('moonloader/WolHelper/Binder/'..imguifile.v..'.txt', 'w+')
-                            filesource:write(customsendchat.v)
+                    if doesFileExist('moonloader/WolHelper/Binder/'..imguifile.v..'.txt') then
+                        if imgui.MenuItem(u8'Обновить информацию') then
+                            local filesource = io.open('moonloader/WolHelper/Binder/'..imguifile.v..'.txt', 'a+')
+                            customsendchat.v = filesource:read('*a')
                             filesource:close()
-                            imgui.CloseCurrentPopup()
                         end
-                        if imgui.MenuItem(u8'Удалить файл') then
-                            os.remove('moonloader/WolHelper/Binder/'..imguifile.v..'.txt')
-                            imgui.CloseCurrentPopup()
-                        end
-                        imgui.EndPopup()
-                    end
+                        imgui.PushItemWidth(500)
+                        imgui.InputTextMultiline('##svoihui', customsendchat)
+                        imgui.PushItemWidth()
 
-                elseif not doesFileExist('moonloader/WolHelper/Binder/'..imguifile.v..'.txt') then
-                    if imgui.Button(u8'Создать файл') then
-                        local filesska = io.open('moonloader/WolHelper/Binder/'..imguifile.v..'.txt', 'w+')
-                        filesska:write(u8'Введите текст\nДля установки задержки используйте wait(время в мс) в новой строчке\nПример:\n/me достал Desert Eagle\nwait(1000)\n/me снял предохранитель')
-                        filesska:close()
-                    end
-                end
-            end
-            imgui.End()
-        end
-        if adminfrak.v then
-            imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-            imgui.SetNextWindowSize(imgui.ImVec2(500, 300), imgui.Cond.FirstUseEver)
-            imgui.Begin(u8'Админ. функции', adminfrak, imgui.WindowFlags.NoSavedSettings + imgui.WindowFlags.AlwaysAutoResize)
-			if imgui.MenuItem(u8'Использовать /agm') then sampSendChat('/agm') end
-			if imgui.MenuItem(u8'Использовать /offgoto') then sampSendChat('/offgoto') end
-            if imgui.CollapsingHeader(u8'Функции с фракциями') then
-                for i, v in ipairs(adminfraklist) do
-                    if v ~= 'Пустой слот' then
-                        if imgui.MenuItem(u8(v)) then
-                            fraqlist = i
-                            fraqname = v
-                            imgui.OpenPopup('fraqmenu')
+                        if imgui.Button(u8'Активировать', imgui.ImVec2(245, 0)) then
+                            lua_thread.create(
+                                function()
+                                    for line in u8:decode(customsendchat.v):gmatch("[^\r\n]+") do
+                                        if line:find('wait%(%d+%)') then local waittime = line:match('wait%((%d+)%)') wait(waittime)
+                                        else
+                                            sampSendChat(line)
+                                        end
+                                    end
+                            end)
+                        end
+                        imgui.SameLine()
+                        if imgui.Button(u8'Взаимодействие', imgui.ImVec2(250, 0)) then
+                            imgui.OpenPopup('VzaimFile')
+                        end
+
+                        if imgui.BeginPopup('VzaimFile') then
+                            if imgui.MenuItem(u8'Сохранить файл') then
+                                local filesource = io.open('moonloader/WolHelper/Binder/'..imguifile.v..'.txt', 'w+')
+                                filesource:write(customsendchat.v)
+                                filesource:close()
+                                imgui.CloseCurrentPopup()
+                            end
+                            if imgui.MenuItem(u8'Удалить файл') then
+                                os.remove('moonloader/WolHelper/Binder/'..imguifile.v..'.txt')
+                                imgui.CloseCurrentPopup()
+                            end
+                            imgui.EndPopup()
+                        end
+
+                    elseif not doesFileExist('moonloader/WolHelper/Binder/'..imguifile.v..'.txt') then
+                        if imgui.Button(u8'Создать файл') then
+                            local filesska = io.open('moonloader/WolHelper/Binder/'..imguifile.v..'.txt', 'w+')
+                            filesska:write(u8'Введите текст\nДля установки задержки используйте wait(время в мс) в новой строчке\nПример:\n/me достал Desert Eagle\nwait(1000)\n/me снял предохранитель')
+                            filesska:close()
                         end
                     end
                 end
+                imgui.End()
             end
-            if imgui.BeginPopup('fraqmenu') then
-                imgui.Text(u8(fraqname ..string.format(' (%d)', fraqlist)))
+            if adminfrak.v then
+                imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+                imgui.SetNextWindowSize(imgui.ImVec2(500, 300), imgui.Cond.FirstUseEver)
+                imgui.Begin(u8'Админ. функции', adminfrak, imgui.WindowFlags.NoSavedSettings + imgui.WindowFlags.AlwaysAutoResize)
+                if imgui.MenuItem(u8'Использовать /agm') then sampSendChat('/agm') end
+                if imgui.MenuItem(u8'Использовать /offgoto') then sampSendChat('/offgoto') end
+                if imgui.CollapsingHeader(u8'Функции с фракциями') then
+                    for i, v in ipairs(adminfraklist) do
+                        if v ~= 'Пустой слот' then
+                            if imgui.MenuItem(u8(v)) then
+                                fraqlist = i
+                                fraqname = v
+                                imgui.OpenPopup('fraqmenu')
+                            end
+                        end
+                    end
+                end
+                if imgui.BeginPopup('fraqmenu') then
+                    imgui.Text(u8(fraqname ..string.format(' (%d)', fraqlist)))
+                    imgui.Separator()
+                    imgui.Spacing()
+                    if imgui.MenuItem(u8'Проверить число игроков') then
+                        sampSendChat('/amembers '..fraqlist)
+                        findimgui.v = true
+                    end
+                    if imgui.MenuItem(u8'Автострой') then
+                        sampSendChat('/amembers '..fraqlist)
+                        trenirovkaimgui.v = true
+                    end
+                    if imgui.MenuItem(u8'Встать на зама') then
+                        sampSendChat('/frakinvite '..fraqlist)
+                    end
+                    if imgui.MenuItem(u8'Встать на временную лиду') then
+                        sampAddChatMessage('/makeleader ' ..fraqlist, - 1)--sampSendChat('/frakinvite '..id)
+                    end
+                    imgui.EndPopup()
+                end
+                imgui.End()
+            end
+            if adminsimgui.v then
+                imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+                imgui.SetNextWindowSize(imgui.ImVec2(600, 450), imgui.Cond.FirstUseEver)
+                imgui.Begin(u8'Админы в сети. Всего админов: ' ..vsegoadm, adminsimgui, imgui.WindowFlags.NoSavedSettings)
+                imgui.Columns(3, _, true)
+                imgui.SetColumnWidth(-1, 220)
+                imgui.Text(u8'Prefix')
+                for i, v in ipairs(adminlist) do
+                    imgui.TextColoredRGB(v['prefix'])
+                end
+                imgui.NextColumn()
+                imgui.Text(u8'Ник [ID] + (лвл):')
+                for i, v in ipairs(adminlist) do
+                    if imgui.MenuItem(string.format('%s [%s] (%s)', v['admname'], v['adminid'], v['admrang'])) then
+                        adminmenu = v
+                        imgui.OpenPopup('adminmenuimgui')
+                    end
+                end
+                imgui.NextColumn()
+                imgui.Text(u8'(Awarn) + [Owarn]')
                 imgui.Separator()
-                imgui.Spacing()
-                if imgui.MenuItem(u8'Проверить число игроков') then
-                    sampSendChat('/amembers '..fraqlist)
-                    findimgui.v = true
+                for i, v in ipairs(adminlist) do
+                    imgui.Text(string.format('(%s/3) [%s/3]', v['adminawarn'], v['adminowarn']))
                 end
-                if imgui.MenuItem(u8'Автострой') then
-                    sampSendChat('/amembers '..fraqlist)
-                    trenirovkaimgui.v = true
+                if imgui.BeginPopup('adminmenuimgui') then
+                    imgui.Text(u8(string.format('%s [%s] (%s)', adminmenu['admname'], adminmenu['adminid'], adminmenu['admrang'])))
+                    imgui.Text(u8(string.format('Awarns: (%s/3), Owarns: (%s/3)', adminmenu['adminawarn'], adminmenu['adminowarn'])))
+                    imgui.Separator()
+                    imgui.Spacing()
+                    if imgui.MenuItem(u8'Проверить доступы') then sampSendChat('/dostup ' ..adminmenu['adminid']) adminsimgui.v = false end
+                    if imgui.MenuItem(u8'Проверить одоступы') then sampSendChat('/odostup ' ..adminmenu['adminid']) adminsimgui.v = false end
+                    if imgui.MenuItem(u8'Проверить статистику') then sampSendChat('/getstats ' ..adminmenu['adminid']) adminsimgui.v = false end
+                    imgui.Separator()
+                    if imgui.MenuItem(u8'Выдать скин') then sampSetChatInputText('/setskin ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
+                    if imgui.MenuItem(u8'Выдать префикс') then sampSetChatInputText('/prefix ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
+                    if imgui.MenuItem(u8'Выдать pidpis') then sampSetChatInputText('/pidpis ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
+                    imgui.Separator()
+                    if imgui.MenuItem(u8'Выдать аварн') then sampSetChatInputText('/adminwarn ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
+                    if imgui.MenuItem(u8'Выдать оварн') then sampSetChatInputText('/owarn ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
+                    imgui.EndPopup()
                 end
-                if imgui.MenuItem(u8'Встать на зама') then
-                    sampSendChat('/frakinvite '..fraqlist)
-                end
-                if imgui.MenuItem(u8'Встать на временную лиду') then
-                    sampAddChatMessage('/makeleader ' ..fraqlist, - 1)--sampSendChat('/frakinvite '..id)
-                end
-                imgui.EndPopup()
+                imgui.End()
             end
-            imgui.End()
         end
-		if adminsimgui.v then
-			imgui.SetNextWindowPos(imgui.ImVec2(sw / 2, sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-			imgui.SetNextWindowSize(imgui.ImVec2(600, 450), imgui.Cond.FirstUseEver)
-			imgui.Begin(u8'Админы в сети. Всего админов: ' ..vsegoadm, adminsimgui, imgui.WindowFlags.NoSavedSettings)
-			imgui.Columns(3, _, true)
-			imgui.SetColumnWidth(-1, 220)
-			imgui.Text(u8'Prefix')
-			for i, v in ipairs(adminlist) do
-				imgui.TextColoredRGB(v['prefix'])
-			end
-			imgui.NextColumn()
-			imgui.Text(u8'Ник [ID] + (лвл):')
-			for i, v in ipairs(adminlist) do
-				if imgui.MenuItem(string.format('%s [%s] (%s)', v['admname'], v['adminid'], v['admrang'])) then
-					adminmenu = v
-					imgui.OpenPopup('adminmenuimgui')
-				end
-			end
-			imgui.NextColumn()
-			imgui.Text(u8'(Awarn) + [Owarn]')
-			imgui.Separator()
-			for i, v in ipairs(adminlist) do
-				imgui.Text(string.format('(%s/3) [%s/3]', v['adminawarn'], v['adminowarn']))
-			end
-			if imgui.BeginPopup('adminmenuimgui') then
-				imgui.Text(u8(string.format('%s [%s] (%s)', adminmenu['admname'], adminmenu['adminid'], adminmenu['admrang'])))
-				imgui.Text(u8(string.format('Awarns: (%s/3), Owarns: (%s/3)', adminmenu['adminawarn'], adminmenu['adminowarn'])))
-				imgui.Separator()
-				imgui.Spacing()
-				if imgui.MenuItem(u8'Проверить доступы') then sampSendChat('/dostup ' ..adminmenu['adminid']) adminsimgui.v = false end
-				if imgui.MenuItem(u8'Проверить одоступы') then sampSendChat('/odostup ' ..adminmenu['adminid']) adminsimgui.v = false end
-				if imgui.MenuItem(u8'Проверить статистику') then sampSendChat('/getstats ' ..adminmenu['adminid']) adminsimgui.v = false end
-				imgui.Separator()
-				if imgui.MenuItem(u8'Выдать скин') then sampSetChatInputText('/setskin ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
-				if imgui.MenuItem(u8'Выдать префикс') then sampSetChatInputText('/prefix ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
-				if imgui.MenuItem(u8'Выдать pidpis') then sampSetChatInputText('/pidpis ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
-				imgui.Separator()
-				if imgui.MenuItem(u8'Выдать аварн') then sampSetChatInputText('/adminwarn ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
-				if imgui.MenuItem(u8'Выдать оварн') then sampSetChatInputText('/owarn ' ..adminmenu['adminid'] ..' ') sampSetChatInputEnabled(true) adminsimgui.v = false end
-				imgui.EndPopup()
-			end
-			imgui.End()
-		end
-    end
 
 
-    function SE.onSetCheckpoint(position, radius)
-        if tpfindresult and position.z < 500 then
-            setCharCoordinates(PLAYER_PED, position.x, position.y, position.z)
-            print(string.format('X: %d, Y: %d, Z: %d', position.x, position.y, position.z))
-            tpfindresult = false
-        elseif tpfindresult and position.z > 500 then
-            sampAddChatMessage(teg ..'Возможно игрок находится в инте. Нажмите {FF7000}Y{FFFFFF} для продолжения или {FF7000}N{FFFFFF} для отклонения', - 1)
-            rkeys.registerHotKey({vkeys.VK_Y}, true, function() setCharCoordinates(PLAYER_PED, position.x, position.y, position.z)
+        function SE.onSetCheckpoint(position, radius)
+            if tpfindresult and position.z < 500 then
+                setCharCoordinates(PLAYER_PED, position.x, position.y, position.z)
                 print(string.format('X: %d, Y: %d, Z: %d', position.x, position.y, position.z))
-                rkeys.unRegisterHotKey({vkeys.VK_Y})
-            rkeys.unRegisterHotKey({vkeys.VK_N}) end)
-            rkeys.registerHotKey({vkeys.VK_N}, true, function()
-                sampAddChatMessage(teg ..'Отклонено', - 1)
-                rkeys.unRegisterHotKey({vkeys.VK_Y})
-            rkeys.unRegisterHotKey({vkeys.VK_N}) end)
-            tpfindresult = false
-        end
-    end
-
-    function wolarmor(arm)
-        if arm:find('%d+') then
-            if arm == '0' then arm = getCharArmour(PLAYER_PED) * - 1 end
-            addArmourToChar(PLAYER_PED, arm)
-        else
-            addArmourToChar(PLAYER_PED, 100)
-        end
-    end
-
-
-    function ganggun(gang)
-        lua_thread.create(function()
-            if gang == nil then getstat = true sampSendChat('/mm') end
-            while gang == nil do wait(0) end
-            local positionX, positionY, positionZ = getCharCoordinates(PLAYER_PED)
-            setCharCoordinates(PLAYER_PED, bandgun[gang][1], bandgun[gang][2], bandgun[gang][3])
-            wait(50)
-            sampSendChat('/gmenu')
-            sampSendDialogResponse(5051, 1, 0, 7)
-            setCharCoordinates(PLAYER_PED, positionX, positionY, positionZ)
-            for i = 0, 20 do
-                sampSendDialogResponse(5051, 1, 4, 7)
+                tpfindresult = false
+            elseif tpfindresult and position.z > 500 then
+                sampAddChatMessage(teg ..'Возможно игрок находится в инте. Нажмите {FF7000}Y{FFFFFF} для продолжения или {FF7000}N{FFFFFF} для отклонения', - 1)
+                rkeys.registerHotKey({vkeys.VK_Y}, true, function() setCharCoordinates(PLAYER_PED, position.x, position.y, position.z)
+                    print(string.format('X: %d, Y: %d, Z: %d', position.x, position.y, position.z))
+                    rkeys.unRegisterHotKey({vkeys.VK_Y})
+                rkeys.unRegisterHotKey({vkeys.VK_N}) end)
+                rkeys.registerHotKey({vkeys.VK_N}, true, function()
+                    sampAddChatMessage(teg ..'Отклонено', - 1)
+                    rkeys.unRegisterHotKey({vkeys.VK_Y})
+                rkeys.unRegisterHotKey({vkeys.VK_N}) end)
+                tpfindresult = false
             end
-            for i = 0, 20 do
-                sampSendDialogResponse(5051, 1, 8, 7)
+        end
+
+        function wolarmor(arm)
+            if arm:find('%d+') then
+                if arm == '0' then arm = getCharArmour(PLAYER_PED) * - 1 end
+                addArmourToChar(PLAYER_PED, arm)
+            else
+                addArmourToChar(PLAYER_PED, 100)
             end
-            for i = 0, 20 do
-                sampSendDialogResponse(5051, 1, 9, 7)
+        end
+
+
+        function ganggun(gang)
+            lua_thread.create(function()
+                if gang == nil then getstat = true sampSendChat('/mm') end
+                while gang == nil do wait(0) end
+                local positionX, positionY, positionZ = getCharCoordinates(PLAYER_PED)
+                setCharCoordinates(PLAYER_PED, bandgun[gang][1], bandgun[gang][2], bandgun[gang][3])
+                wait(50)
+                sampSendChat('/gmenu')
+                sampSendDialogResponse(5051, 1, 0, 7)
+                setCharCoordinates(PLAYER_PED, positionX, positionY, positionZ)
+                for i = 0, 20 do
+                    sampSendDialogResponse(5051, 1, 4, 7)
+                end
+                for i = 0, 20 do
+                    sampSendDialogResponse(5051, 1, 8, 7)
+                end
+                for i = 0, 20 do
+                    sampSendDialogResponse(5051, 1, 9, 7)
+                end
+            end)
+        end
+
+        function wolcarhp(args)
+            if carhpthread ~= nil then notf.addNotification('Ошибка!\n\nНе прошло 2 секунды до предыдущей смены!', 5, 1) return end
+            carhpthread = lua_thread.create(function()
+                if args:find('^%d+') then
+                blockcarhp = true
+                setCarHealth(storeCarCharIsInNoSave(PLAYER_PED), args)
+                wait(1000)
+                blockcarhp = false
+                carhpthread = nil
+            else
+                blockcarhp = true
+                setCarHealth(storeCarCharIsInNoSave(PLAYER_PED), 1000)
+                wait(1000)
+                blockcarhp = false
+                carhpthread = nil
             end
         end)
     end
 
-    function wolcarhp(args)
-        if carhpthread ~= nil then notf.addNotification('Ошибка!\n\nНе прошло 2 секунды до предыдущей смены!', 5, 1) return end
-        carhpthread = lua_thread.create(function()
-            if args:find('^%d+') then
-            blockcarhp = true
-            setCarHealth(storeCarCharIsInNoSave(PLAYER_PED), args)
+    function hitmangun()
+        lua_thread.create(function()
+            local positionX, positionY, positionZ = getCharCoordinates(PLAYER_PED)
+            setCharCoordinates(PLAYER_PED, - 2240, 2351, 5)
+            sampSendChat('/menu')
+            wait(25)
+            sampSendDialogResponse(5051, 1, 3, 7)
+            setCharCoordinates(PLAYER_PED, positionX, positionY, positionZ)
+        end)
+    end
+
+    function SE.onSetVehicleHealth(vehicleId, health)
+        if blockcarhp then return false end
+    end
+
+    function vigovor(arg)
+        local id, prichinaviga = arg:match('(%d+) (.+)')
+        if id == nil or prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', - 1) return end
+        lua_thread.create(function()
+            sampSendChat('/vig '..arg)
             wait(1000)
-            blockcarhp = false
-            carhpthread = nil
-        else
-            blockcarhp = true
-            setCarHealth(storeCarCharIsInNoSave(PLAYER_PED), 1000)
+            sampSendChat('/r Сотрудник '..sampGetPlayerNickname(id):gsub('_', ' ')..' получает выговор')
             wait(1000)
-            blockcarhp = false
-            carhpthread = nil
+            sampSendChat('/r Причина: '..prichinaviga)
+        end)
+    end
+
+    function uninviteska(arg)
+        local id, prichinaviga = arg:match('(%d+) (.+)')
+        if id == nil or prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', - 1) return end
+        lua_thread.create(function()
+            sampSendChat('/uninvite '..arg)
+            wait(1000)
+            sampSendChat('/r Сотрудник '..sampGetPlayerNickname(id):gsub('_', ' ')..' уволен')
+            wait(1000)
+            sampSendChat('/r Причина: '..prichinaviga)
+        end)
+    end
+
+    function setpostimefunc()
+        local activetepos = true
+        showCursor(true, true)
+        lua_thread.create(function()
+            while activetepos do
+            wait(0)
+            local x, y = getCursorPos()
+            sampTextdrawSetPos(16, x, y)
+            sampTextdrawSetPos(17, x - 9, y + 20)
+            if isKeyDown(VK_RETURN) then wol.timeposx, wol.timeposy = x, y activetepos = false end
         end
+        showCursor(false, false)
+        sampAddChatMessage(teg ..'Координаты часов: X: '..wol.timeposx ..' Y: ' ..wol.timeposy, - 1)
+        inicfg.save(default, 'Way_Of_Life_Helper.ini')
     end)
 end
 
-function hitmangun()
+function adminloginfunc()
+    local pass = stringToArray(''..wol.woladminpass)
     lua_thread.create(function()
-        local positionX, positionY, positionZ = getCharCoordinates(PLAYER_PED)
-        setCharCoordinates(PLAYER_PED, - 2240, 2351, 5)
-        sampSendChat('/menu')
-        wait(25)
-        sampSendDialogResponse(5051, 1, 3, 7)
-        setCharCoordinates(PLAYER_PED, positionX, positionY, positionZ)
-    end)
-end
-
-function SE.onSetVehicleHealth(vehicleId, health)
-    if blockcarhp then return false end
-end
-
-function vigovor(arg)
-	local id, prichinaviga = arg:match('(%d+) (.+)')
-	if id == nil or prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', - 1) return end
-    lua_thread.create(function()
-        sampSendChat('/vig '..arg)
-        wait(1000)
-        sampSendChat('/r Сотрудник '..sampGetPlayerNickname(id):gsub('_', ' ')..' получает выговор')
-        wait(1000)
-        sampSendChat('/r Причина: '..prichinaviga)
-    end)
-end
-
-function uninviteska(arg)
-	local id, prichinaviga = arg:match('(%d+) (.+)')
-	if id == nil or prichinaviga == nil then sampAddChatMessage(teg ..'Ошибка! Введите {FF7000}/vig + ID + Причина', - 1) return end
-    lua_thread.create(function()
-        sampSendChat('/uninvite '..arg)
-        wait(1000)
-        sampSendChat('/r Сотрудник '..sampGetPlayerNickname(id):gsub('_', ' ')..' уволен')
-        wait(1000)
-        sampSendChat('/r Причина: '..prichinaviga)
-    end)
+    for k, v in pairs(pass) do
+        sampSendClickTextdraw(alogintextdraw[tonumber(v)])
+        wait(90)
+    end
+	sampSendClickTextdraw(63)
+end)
 end
 
 
@@ -1368,80 +1453,85 @@ end
 
 
 
-
-
+function stringToArray(str)
+local t = {}
+for i = 1, #str do
+    t[i] = str:sub(i, i)
+end
+return t
+end
 
 local russian_characters = {
-    [168] = 'Ё', [184] = 'ё', [192] = 'А', [193] = 'Б', [194] = 'В', [195] = 'Г', [196] = 'Д', [197] = 'Е', [198] = 'Ж', [199] = 'З', [200] = 'И', [201] = 'Й', [202] = 'К', [203] = 'Л', [204] = 'М', [205] = 'Н', [206] = 'О', [207] = 'П', [208] = 'Р', [209] = 'С', [210] = 'Т', [211] = 'У', [212] = 'Ф', [213] = 'Х', [214] = 'Ц', [215] = 'Ч', [216] = 'Ш', [217] = 'Щ', [218] = 'Ъ', [219] = 'Ы', [220] = 'Ь', [221] = 'Э', [222] = 'Ю', [223] = 'Я', [224] = 'а', [225] = 'б', [226] = 'в', [227] = 'г', [228] = 'д', [229] = 'е', [230] = 'ж', [231] = 'з', [232] = 'и', [233] = 'й', [234] = 'к', [235] = 'л', [236] = 'м', [237] = 'н', [238] = 'о', [239] = 'п', [240] = 'р', [241] = 'с', [242] = 'т', [243] = 'у', [244] = 'ф', [245] = 'х', [246] = 'ц', [247] = 'ч', [248] = 'ш', [249] = 'щ', [250] = 'ъ', [251] = 'ы', [252] = 'ь', [253] = 'э', [254] = 'ю', [255] = 'я',
+[168] = 'Ё', [184] = 'ё', [192] = 'А', [193] = 'Б', [194] = 'В', [195] = 'Г', [196] = 'Д', [197] = 'Е', [198] = 'Ж', [199] = 'З', [200] = 'И', [201] = 'Й', [202] = 'К', [203] = 'Л', [204] = 'М', [205] = 'Н', [206] = 'О', [207] = 'П', [208] = 'Р', [209] = 'С', [210] = 'Т', [211] = 'У', [212] = 'Ф', [213] = 'Х', [214] = 'Ц', [215] = 'Ч', [216] = 'Ш', [217] = 'Щ', [218] = 'Ъ', [219] = 'Ы', [220] = 'Ь', [221] = 'Э', [222] = 'Ю', [223] = 'Я', [224] = 'а', [225] = 'б', [226] = 'в', [227] = 'г', [228] = 'д', [229] = 'е', [230] = 'ж', [231] = 'з', [232] = 'и', [233] = 'й', [234] = 'к', [235] = 'л', [236] = 'м', [237] = 'н', [238] = 'о', [239] = 'п', [240] = 'р', [241] = 'с', [242] = 'т', [243] = 'у', [244] = 'ф', [245] = 'х', [246] = 'ц', [247] = 'ч', [248] = 'ш', [249] = 'щ', [250] = 'ъ', [251] = 'ы', [252] = 'ь', [253] = 'э', [254] = 'ю', [255] = 'я',
 }
 function string.rlower(s)
-    s = s:lower()
-    local strlen = s:len()
-    if strlen == 0 then return s end
-    s = s:lower()
-    local output = ''
-    for i = 1, strlen do
-        local ch = s:byte(i)
-        if ch >= 192 and ch <= 223 then -- upper russian characters
-            output = output .. russian_characters[ch + 32]
-        elseif ch == 168 then -- Ё
-            output = output .. russian_characters[184]
-        else
-            output = output .. string.char(ch)
-        end
+s = s:lower()
+local strlen = s:len()
+if strlen == 0 then return s end
+s = s:lower()
+local output = ''
+for i = 1, strlen do
+    local ch = s:byte(i)
+    if ch >= 192 and ch <= 223 then -- upper russian characters
+        output = output .. russian_characters[ch + 32]
+    elseif ch == 168 then -- Ё
+        output = output .. russian_characters[184]
+    else
+        output = output .. string.char(ch)
     end
-    return output
+end
+return output
 end
 function string.rupper(s)
-    s = s:upper()
-    local strlen = s:len()
-    if strlen == 0 then return s end
-    s = s:upper()
-    local output = ''
-    for i = 1, strlen do
-        local ch = s:byte(i)
-        if ch >= 224 and ch <= 255 then -- lower russian characters
-            output = output .. russian_characters[ch - 32]
-        elseif ch == 184 then -- ё
-            output = output .. russian_characters[168]
-        else
-            output = output .. string.char(ch)
-        end
+s = s:upper()
+local strlen = s:len()
+if strlen == 0 then return s end
+s = s:upper()
+local output = ''
+for i = 1, strlen do
+    local ch = s:byte(i)
+    if ch >= 224 and ch <= 255 then -- lower russian characters
+        output = output .. russian_characters[ch - 32]
+    elseif ch == 184 then -- ё
+        output = output .. russian_characters[168]
+    else
+        output = output .. string.char(ch)
     end
-    return output
+end
+return output
 end
 
 
 
 function onScriptTerminate(script, quitGame)
-    if script == idnotf then
-        lua_thread.create(function() wait(10) notf = import 'imgui_notf.lua' notf.addNotification('WolHelper успешно загружен\n\nВерсия скрипта: '..thisScript().version, 5, 1) end)
-    end
-    if script == thisScript() then
-        sampAddChatMessage(teg ..'Скрипт крашнуло. Перезагружен автоматически', - 1)
-        thisScript():reload()
-    end
+if script == idnotf then
+    lua_thread.create(function() wait(10) notf = import 'imgui_notf.lua' notf.addNotification('WolHelper успешно загружен\n\nВерсия скрипта: '..thisScript().version, 5, 1) end)
+end
+if script == thisScript() then
+    sampAddChatMessage(teg ..'Скрипт крашнуло. Перезагружен автоматически', - 1)
+    thisScript():reload()
+end
 end
 
 function inFileRead(read_patch)
-    for line in io.lines(getWorkingDirectory()..'/WolHelper/'..read_patch) do
-        sampSendChat(line)
-        wait(1000)
-    end
+for line in io.lines(getWorkingDirectory()..'/WolHelper/'..read_patch) do
+    sampSendChat(line)
+    wait(1000)
+end
 end
 
 function inFileReadProsmotr(read_patch)
-    for line in io.lines(getWorkingDirectory()..'/WolHelper/'..read_patch) do
-        imgui.Text(u8(line))
-    end
+for line in io.lines(getWorkingDirectory()..'/WolHelper/'..read_patch) do
+    imgui.Text(u8(line))
+end
 end
 
 function ShowHelpMarker(text)
-    imgui.SameLine()
-    imgui.TextDisabled("(?)")
-    if (imgui.IsItemHovered()) then
-        imgui.SetTooltip(u8(text))
-    end
+imgui.SameLine()
+imgui.TextDisabled("(?)")
+if (imgui.IsItemHovered()) then
+    imgui.SetTooltip(u8(text))
+end
 end
 
 
@@ -1451,198 +1541,198 @@ encoding.default = 'CP1251'
 local u8 = encoding.UTF8
 
 function imgui.CenterTextColoredRGB(text)
-    local width = imgui.GetWindowWidth()
-    local style = imgui.GetStyle()
-    local colors = style.Colors
-    local ImVec4 = imgui.ImVec4
+local width = imgui.GetWindowWidth()
+local style = imgui.GetStyle()
+local colors = style.Colors
+local ImVec4 = imgui.ImVec4
 
-    local explode_argb = function(argb)
-        local a = bit.band(bit.rshift(argb, 24), 0xFF)
-        local r = bit.band(bit.rshift(argb, 16), 0xFF)
-        local g = bit.band(bit.rshift(argb, 8), 0xFF)
-        local b = bit.band(argb, 0xFF)
-        return a, r, g, b
+local explode_argb = function(argb)
+    local a = bit.band(bit.rshift(argb, 24), 0xFF)
+    local r = bit.band(bit.rshift(argb, 16), 0xFF)
+    local g = bit.band(bit.rshift(argb, 8), 0xFF)
+    local b = bit.band(argb, 0xFF)
+    return a, r, g, b
+end
+
+local getcolor = function(color)
+    if color:sub(1, 6):upper() == 'SSSSSS' then
+        local r, g, b = colors[1].x, colors[1].y, colors[1].z
+        local a = tonumber(color:sub(7, 8), 16) or colors[1].w * 255
+        return ImVec4(r, g, b, a / 255)
     end
+    local color = type(color) == 'string' and tonumber(color, 16) or color
+    if type(color) ~= 'number' then return end
+    local r, g, b, a = explode_argb(color)
+    return imgui.ImColor(r, g, b, a):GetVec4()
+end
 
-    local getcolor = function(color)
-        if color:sub(1, 6):upper() == 'SSSSSS' then
-            local r, g, b = colors[1].x, colors[1].y, colors[1].z
-            local a = tonumber(color:sub(7, 8), 16) or colors[1].w * 255
-            return ImVec4(r, g, b, a / 255)
-        end
-        local color = type(color) == 'string' and tonumber(color, 16) or color
-        if type(color) ~= 'number' then return end
-        local r, g, b, a = explode_argb(color)
-        return imgui.ImColor(r, g, b, a):GetVec4()
-    end
-
-    local render_text = function(text_)
-        for w in text_:gmatch('[^\r\n]+') do
-            local textsize = w:gsub('{.-}', '')
-            local text_width = imgui.CalcTextSize(u8(textsize))
-            imgui.SetCursorPosX( width / 2 - text_width .x / 2 )
-            local text, colors_, m = {}, {}, 1
-            w = w:gsub('{(......)}', '{%1FF}')
-            while w:find('{........}') do
-                local n, k = w:find('{........}')
-                local color = getcolor(w:sub(n + 1, k - 1))
-                if color then
-                    text[#text], text[#text + 1] = w:sub(m, n - 1), w:sub(k + 1, #w)
-                    colors_[#colors_ + 1] = color
-                    m = n
-                end
-                w = w:sub(1, n - 1) .. w:sub(k + 1, #w)
+local render_text = function(text_)
+    for w in text_:gmatch('[^\r\n]+') do
+        local textsize = w:gsub('{.-}', '')
+        local text_width = imgui.CalcTextSize(u8(textsize))
+        imgui.SetCursorPosX( width / 2 - text_width .x / 2 )
+        local text, colors_, m = {}, {}, 1
+        w = w:gsub('{(......)}', '{%1FF}')
+        while w:find('{........}') do
+            local n, k = w:find('{........}')
+            local color = getcolor(w:sub(n + 1, k - 1))
+            if color then
+                text[#text], text[#text + 1] = w:sub(m, n - 1), w:sub(k + 1, #w)
+                colors_[#colors_ + 1] = color
+                m = n
             end
-            if text[0] then
-                for i = 0, #text do
-                    imgui.TextColored(colors_[i] or colors[1], u8(text[i]))
-                    imgui.SameLine(nil, 0)
-                end
-                imgui.NewLine()
-            else
-                imgui.Text(u8(w))
+            w = w:sub(1, n - 1) .. w:sub(k + 1, #w)
+        end
+        if text[0] then
+            for i = 0, #text do
+                imgui.TextColored(colors_[i] or colors[1], u8(text[i]))
+                imgui.SameLine(nil, 0)
             end
+            imgui.NewLine()
+        else
+            imgui.Text(u8(w))
         end
     end
-    render_text(text)
+end
+render_text(text)
 end
 
 
 
 function async_http_request(method, url, args, resolve, reject)
-    local request_lane = lanes.gen('*', {package = {path = package.path, cpath = package.cpath}}, function()
-        local requests = require 'requests'
-        local ok, result = pcall(requests.request, method, url, args)
-        if ok then
-            result.json, result.xml = nil, nil -- cannot be passed through a lane
-            return true, result
-        else
-            return false, result -- return error
+local request_lane = lanes.gen('*', {package = {path = package.path, cpath = package.cpath}}, function()
+    local requests = require 'requests'
+    local ok, result = pcall(requests.request, method, url, args)
+    if ok then
+        result.json, result.xml = nil, nil -- cannot be passed through a lane
+        return true, result
+    else
+        return false, result -- return error
+    end
+end)
+if not reject then reject = function() end end
+lua_thread.create(function()
+    local lh = request_lane()
+    while true do
+        local status = lh.status
+        if status == 'done' then
+            local ok, result = lh[1], lh[2]
+            if ok then resolve(result) else reject(result) end
+            return
+        elseif status == 'error' then
+            return reject(lh[1])
+        elseif status == 'killed' or status == 'cancelled' then
+            return reject(status)
         end
-    end)
-    if not reject then reject = function() end end
-    lua_thread.create(function()
-        local lh = request_lane()
-        while true do
-            local status = lh.status
-            if status == 'done' then
-                local ok, result = lh[1], lh[2]
-                if ok then resolve(result) else reject(result) end
-                return
-            elseif status == 'error' then
-                return reject(lh[1])
-            elseif status == 'killed' or status == 'cancelled' then
-                return reject(status)
-            end
-            wait(0)
-        end
-    end)
+        wait(0)
+    end
+end)
 end
 
 function imgui.TextColoredRGB(string)
-    local style = imgui.GetStyle()
-    local colors = style.Colors
-    local clr = imgui.Col
+local style = imgui.GetStyle()
+local colors = style.Colors
+local clr = imgui.Col
 
-    local function color_imvec4(color)
-        if color:upper() == 'SSSSSS' then return colors[clr.Text] end
-        local color = type(color) == 'number' and ('%X'):format(color):upper() or color:upper()
-        local rgb = {}
-        for i = 1, #color / 2 do rgb[#rgb + 1] = tonumber(color:sub(2 * i - 1, 2 * i), 16) end
-        return imgui.ImVec4(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, rgb[4] and rgb[4] / 255 or colors[clr.Text].w)
+local function color_imvec4(color)
+    if color:upper() == 'SSSSSS' then return colors[clr.Text] end
+    local color = type(color) == 'number' and ('%X'):format(color):upper() or color:upper()
+    local rgb = {}
+    for i = 1, #color / 2 do rgb[#rgb + 1] = tonumber(color:sub(2 * i - 1, 2 * i), 16) end
+    return imgui.ImVec4(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, rgb[4] and rgb[4] / 255 or colors[clr.Text].w)
+end
+
+local function render_text(string)
+    local text, color = {}, {}
+    local m = 1
+    while string:find('{......}') do
+        local n, k = string:find('{......}')
+        text[#text], text[#text + 1] = string:sub(m, n - 1), string:sub(k + 1, #string)
+        color[#color + 1] = color_imvec4(string:sub(n + 1, k - 1))
+        local t1, t2 = string:sub(1, n - 1), string:sub(k + 1, #string)
+        string = t1..t2
+        m = k - 7
     end
-
-    local function render_text(string)
-        local text, color = {}, {}
-        local m = 1
-        while string:find('{......}') do
-            local n, k = string:find('{......}')
-            text[#text], text[#text + 1] = string:sub(m, n - 1), string:sub(k + 1, #string)
-            color[#color + 1] = color_imvec4(string:sub(n + 1, k - 1))
-            local t1, t2 = string:sub(1, n - 1), string:sub(k + 1, #string)
-            string = t1..t2
-            m = k - 7
+    if text[0] then
+        for i, _ in ipairs(text) do
+            imgui.TextColored(color[i] or colors[clr.Text], u8(text[i]))
+            imgui.SameLine(nil, 0)
         end
-        if text[0] then
-            for i, _ in ipairs(text) do
-                imgui.TextColored(color[i] or colors[clr.Text], u8(text[i]))
-                imgui.SameLine(nil, 0)
-            end
-            imgui.NewLine()
-        else imgui.Text(u8(string)) end
-    end
+        imgui.NewLine()
+    else imgui.Text(u8(string)) end
+end
 
-    render_text(string)
+render_text(string)
 end
 
 function getTargetBlipCoordinatesFixed()
-    local bool, x, y, z = getTargetBlipCoordinates(); if not bool then return false end
-    requestCollision(x, y); loadScene(x, y, z)
-    local bool, x, y, z = getTargetBlipCoordinates()
-    return bool, x, y, z
+local bool, x, y, z = getTargetBlipCoordinates(); if not bool then return false end
+requestCollision(x, y); loadScene(x, y, z)
+local bool, x, y, z = getTargetBlipCoordinates()
+return bool, x, y, z
 end
 
 
 function apply_custom_style()
-    imgui.SwitchContext()
-    local style = imgui.GetStyle()
-    local colors = style.Colors
-    local clr = imgui.Col
-    local ImVec4 = imgui.ImVec4
+imgui.SwitchContext()
+local style = imgui.GetStyle()
+local colors = style.Colors
+local clr = imgui.Col
+local ImVec4 = imgui.ImVec4
 
-    style.WindowRounding = 2.0
-    style.WindowTitleAlign = imgui.ImVec2(0.5, 0.84)
-    style.ChildWindowRounding = 2.0
-    style.FrameRounding = 2.0
-    style.ItemSpacing = imgui.ImVec2(5.0, 4.0)
-    style.ScrollbarSize = 13.0
-    style.ScrollbarRounding = 0
-    style.GrabMinSize = 8.0
-    style.GrabRounding = 1.0
+style.WindowRounding = 2.0
+style.WindowTitleAlign = imgui.ImVec2(0.5, 0.84)
+style.ChildWindowRounding = 2.0
+style.FrameRounding = 2.0
+style.ItemSpacing = imgui.ImVec2(5.0, 4.0)
+style.ScrollbarSize = 13.0
+style.ScrollbarRounding = 0
+style.GrabMinSize = 8.0
+style.GrabRounding = 1.0
 
-    colors[clr.FrameBg] = ImVec4(0.16, 0.29, 0.48, 0.54)
-    colors[clr.FrameBgHovered] = ImVec4(0.26, 0.59, 0.98, 0.40)
-    colors[clr.FrameBgActive] = ImVec4(0.26, 0.59, 0.98, 0.67)
-    colors[clr.TitleBg] = ImVec4(0.04, 0.04, 0.04, 1.00)
-    colors[clr.TitleBgActive] = ImVec4(0.16, 0.29, 0.48, 1.00)
-    colors[clr.TitleBgCollapsed] = ImVec4(0.00, 0.00, 0.00, 0.51)
-    colors[clr.CheckMark] = ImVec4(0.26, 0.59, 0.98, 1.00)
-    colors[clr.SliderGrab] = ImVec4(0.24, 0.52, 0.88, 1.00)
-    colors[clr.SliderGrabActive] = ImVec4(0.26, 0.59, 0.98, 1.00)
-    colors[clr.Button] = ImVec4(0.26, 0.59, 0.98, 0.40)
-    colors[clr.ButtonHovered] = ImVec4(0.26, 0.59, 0.98, 1.00)
-    colors[clr.ButtonActive] = ImVec4(0.06, 0.53, 0.98, 1.00)
-    colors[clr.Header] = ImVec4(0.26, 0.59, 0.98, 0.31)
-    colors[clr.HeaderHovered] = ImVec4(0.26, 0.59, 0.98, 0.80)
-    colors[clr.HeaderActive] = ImVec4(0.26, 0.59, 0.98, 1.00)
-    colors[clr.Separator] = colors[clr.Border]
-    colors[clr.SeparatorHovered] = ImVec4(0.26, 0.59, 0.98, 0.78)
-    colors[clr.SeparatorActive] = ImVec4(0.26, 0.59, 0.98, 1.00)
-    colors[clr.ResizeGrip] = ImVec4(0.26, 0.59, 0.98, 0.25)
-    colors[clr.ResizeGripHovered] = ImVec4(0.26, 0.59, 0.98, 0.67)
-    colors[clr.ResizeGripActive] = ImVec4(0.26, 0.59, 0.98, 0.95)
-    colors[clr.TextSelectedBg] = ImVec4(0.26, 0.59, 0.98, 0.35)
-    colors[clr.Text] = ImVec4(1.00, 1.00, 1.00, 1.00)
-    colors[clr.TextDisabled] = ImVec4(0.50, 0.50, 0.50, 1.00)
-    colors[clr.WindowBg] = ImVec4(0.06, 0.06, 0.06, 0.94)
-    colors[clr.ChildWindowBg] = ImVec4(1.00, 1.00, 1.00, 0.00)
-    colors[clr.PopupBg] = ImVec4(0.08, 0.08, 0.08, 0.94)
-    colors[clr.ComboBg] = colors[clr.PopupBg]
-    colors[clr.Border] = ImVec4(0.43, 0.43, 0.50, 0.50)
-    colors[clr.BorderShadow] = ImVec4(0.00, 0.00, 0.00, 0.00)
-    colors[clr.MenuBarBg] = ImVec4(0.14, 0.14, 0.14, 1.00)
-    colors[clr.ScrollbarBg] = ImVec4(0.02, 0.02, 0.02, 0.53)
-    colors[clr.ScrollbarGrab] = ImVec4(0.31, 0.31, 0.31, 1.00)
-    colors[clr.ScrollbarGrabHovered] = ImVec4(0.41, 0.41, 0.41, 1.00)
-    colors[clr.ScrollbarGrabActive] = ImVec4(0.51, 0.51, 0.51, 1.00)
-    colors[clr.CloseButton] = ImVec4(0.41, 0.41, 0.41, 0.50)
-    colors[clr.CloseButtonHovered] = ImVec4(0.98, 0.39, 0.36, 1.00)
-    colors[clr.CloseButtonActive] = ImVec4(0.98, 0.39, 0.36, 1.00)
-    colors[clr.PlotLines] = ImVec4(0.61, 0.61, 0.61, 1.00)
-    colors[clr.PlotLinesHovered] = ImVec4(1.00, 0.43, 0.35, 1.00)
-    colors[clr.PlotHistogram] = ImVec4(0.90, 0.70, 0.00, 1.00)
-    colors[clr.PlotHistogramHovered] = ImVec4(1.00, 0.60, 0.00, 1.00)
-    colors[clr.ModalWindowDarkening] = ImVec4(0.80, 0.80, 0.80, 0.35)
+colors[clr.FrameBg] = ImVec4(0.16, 0.29, 0.48, 0.54)
+colors[clr.FrameBgHovered] = ImVec4(0.26, 0.59, 0.98, 0.40)
+colors[clr.FrameBgActive] = ImVec4(0.26, 0.59, 0.98, 0.67)
+colors[clr.TitleBg] = ImVec4(0.04, 0.04, 0.04, 1.00)
+colors[clr.TitleBgActive] = ImVec4(0.16, 0.29, 0.48, 1.00)
+colors[clr.TitleBgCollapsed] = ImVec4(0.00, 0.00, 0.00, 0.51)
+colors[clr.CheckMark] = ImVec4(0.26, 0.59, 0.98, 1.00)
+colors[clr.SliderGrab] = ImVec4(0.24, 0.52, 0.88, 1.00)
+colors[clr.SliderGrabActive] = ImVec4(0.26, 0.59, 0.98, 1.00)
+colors[clr.Button] = ImVec4(0.26, 0.59, 0.98, 0.40)
+colors[clr.ButtonHovered] = ImVec4(0.26, 0.59, 0.98, 1.00)
+colors[clr.ButtonActive] = ImVec4(0.06, 0.53, 0.98, 1.00)
+colors[clr.Header] = ImVec4(0.26, 0.59, 0.98, 0.31)
+colors[clr.HeaderHovered] = ImVec4(0.26, 0.59, 0.98, 0.80)
+colors[clr.HeaderActive] = ImVec4(0.26, 0.59, 0.98, 1.00)
+colors[clr.Separator] = colors[clr.Border]
+colors[clr.SeparatorHovered] = ImVec4(0.26, 0.59, 0.98, 0.78)
+colors[clr.SeparatorActive] = ImVec4(0.26, 0.59, 0.98, 1.00)
+colors[clr.ResizeGrip] = ImVec4(0.26, 0.59, 0.98, 0.25)
+colors[clr.ResizeGripHovered] = ImVec4(0.26, 0.59, 0.98, 0.67)
+colors[clr.ResizeGripActive] = ImVec4(0.26, 0.59, 0.98, 0.95)
+colors[clr.TextSelectedBg] = ImVec4(0.26, 0.59, 0.98, 0.35)
+colors[clr.Text] = ImVec4(1.00, 1.00, 1.00, 1.00)
+colors[clr.TextDisabled] = ImVec4(0.50, 0.50, 0.50, 1.00)
+colors[clr.WindowBg] = ImVec4(0.06, 0.06, 0.06, 0.94)
+colors[clr.ChildWindowBg] = ImVec4(1.00, 1.00, 1.00, 0.00)
+colors[clr.PopupBg] = ImVec4(0.08, 0.08, 0.08, 0.94)
+colors[clr.ComboBg] = colors[clr.PopupBg]
+colors[clr.Border] = ImVec4(0.43, 0.43, 0.50, 0.50)
+colors[clr.BorderShadow] = ImVec4(0.00, 0.00, 0.00, 0.00)
+colors[clr.MenuBarBg] = ImVec4(0.14, 0.14, 0.14, 1.00)
+colors[clr.ScrollbarBg] = ImVec4(0.02, 0.02, 0.02, 0.53)
+colors[clr.ScrollbarGrab] = ImVec4(0.31, 0.31, 0.31, 1.00)
+colors[clr.ScrollbarGrabHovered] = ImVec4(0.41, 0.41, 0.41, 1.00)
+colors[clr.ScrollbarGrabActive] = ImVec4(0.51, 0.51, 0.51, 1.00)
+colors[clr.CloseButton] = ImVec4(0.41, 0.41, 0.41, 0.50)
+colors[clr.CloseButtonHovered] = ImVec4(0.98, 0.39, 0.36, 1.00)
+colors[clr.CloseButtonActive] = ImVec4(0.98, 0.39, 0.36, 1.00)
+colors[clr.PlotLines] = ImVec4(0.61, 0.61, 0.61, 1.00)
+colors[clr.PlotLinesHovered] = ImVec4(1.00, 0.43, 0.35, 1.00)
+colors[clr.PlotHistogram] = ImVec4(0.90, 0.70, 0.00, 1.00)
+colors[clr.PlotHistogramHovered] = ImVec4(1.00, 0.60, 0.00, 1.00)
+colors[clr.ModalWindowDarkening] = ImVec4(0.80, 0.80, 0.80, 0.35)
 end
 
 apply_custom_style()
