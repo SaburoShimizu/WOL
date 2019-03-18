@@ -350,7 +350,8 @@ sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui
 sampRegisterChatCommand('woladmin', function() adminfrak.v = true end)
 sampRegisterChatCommand('wolstrob', function() strobes = not strobes if strobes then strobesfunc:run() end end)
 sampRegisterChatCommand('admins', function() sampSendChat('/admins') adminsimgui.v = true end)
---sampRegisterChatCommand('wolsetpostime', setpostimefunc)
+sampRegisterChatCommand('checktextdraw', function() for i = 0, 4000 do if sampTextdrawIsExists(i) then sampAddChatMessage(sampTextdrawGetString(i) ..i, -1) end end end)
+sampRegisterChatCommand('wolsetpostime', setpostimefunc)
 
 if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
 
@@ -1148,7 +1149,7 @@ function imgui.OnDrawFrame()
                     sampSendChat('/frakinvite '..fraqlist)
                 end
                 if imgui.MenuItem(u8'Встать на временную лиду') then
-                    sampAddChatMessage('/makeleader ' ..fraqlist, - 1)--sampSendChat('/frakinvite '..id)
+                    sampAddChatMessage('/makeleader ' ..fraqlist, - 1)
                 end
                 imgui.EndPopup()
             end
@@ -1161,13 +1162,13 @@ function imgui.OnDrawFrame()
             imgui.Columns(3, _, true)
             imgui.SetColumnWidth(-1, 220)
             imgui.Text(u8'Prefix')
-			imgui.NewLine()
+            imgui.NewLine()
             for i, v in ipairs(adminlist) do
                 imgui.TextColoredRGB(v['prefix'])
             end
             imgui.NextColumn()
             imgui.Text(u8'Ник [ID] + (лвл):')
-			imgui.NewLine()
+            imgui.NewLine()
             for i, v in ipairs(adminlist) do
                 if imgui.MenuItem(string.format('%s [%s] (%s)', v['admname'], v['adminid'], v['admrang'])) then
                     adminmenu = v
@@ -1176,7 +1177,7 @@ function imgui.OnDrawFrame()
             end
             imgui.NextColumn()
             imgui.Text(u8'(Awarn) + [Owarn]')
-			imgui.NewLine()
+            imgui.NewLine()
             for i, v in ipairs(adminlist) do
                 imgui.Text(string.format('(%s/3) [%s/3]', v['adminawarn'], v['adminowarn']))
             end
@@ -1331,25 +1332,28 @@ end
 function adminloginfunc()
 local pass = stringToArray(''..wol.woladminpass)
 lua_thread.create(function()
+	wait(500)
     for k, v in pairs(pass) do
     sampSendClickTextdraw(alogintextdraw[tonumber(v)])
-    wait(200)
+    wait(300)
 end
-sampSendClickTextdraw(63)
+wait(700)
+    sampSendClickTextdraw(63)
 end)
 end
 
 function offpaydayfunc()
-	local date = os.date('*t')
-	while wol.offpayday do
-		wait(0)
-		if date.min == 59 and date.sec == 30 then sampDisconnectWithReason(true) end
-		if date.min == 1 and date.sec == 0 then sampConnectToServer('176.32.36.103', 7777) end
-	end
+    while wol.offpayday do
+        wait(0)
+        local date = os.date('*t')
+        if date.min == 59 and date.sec == 10 then sampDisconnectWithReason(true) wait(1000) end
+        if date.min == 1 and date.sec == 0 then sampConnectToServer('176.32.36.103', 7777) wait(1000) end
+    end
 end
 
-
-
+function SE.onShowTextdraw(id, data)
+	if id == 16 then data.position.x = 200 return {id, data} end
+end
 
 
 
