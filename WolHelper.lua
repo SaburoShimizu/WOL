@@ -297,352 +297,352 @@ end
 end)
 
 function main()
-if not isSampfuncsLoaded() or not isSampLoaded() then return end
-while not isSampAvailable() do wait(100) end
-local ip = sampGetCurrentServerAddress()
+    if not isSampfuncsLoaded() or not isSampLoaded() then return end
+    while not isSampAvailable() do wait(100) end
+    local ip = sampGetCurrentServerAddress()
 
-if ip:find('176.32.36.103') or ip:find('176.32.39.159') then activ = true sampAddChatMessage('{FF0000}WolHelper {FFFFFF}для {00FF00}Way Of Life и After Life {01A0E9}загружен', - 1) sampAddChatMessage(teg ..'/wolhelp - команды скрипта. Версия скрипта: {d5dedd}' ..thisScript().version, - 1) sampAddChatMessage(teg ..'Если ваша статистика не была проверена автоматически введите {FF7000}/getstat', - 1) if wol.mvd then if script.find('MVDhelper Era') then script.find('MVDhelper Era'):unload() end end else thisScript():unload() end
+    if ip:find('176.32.36.103') or ip:find('176.32.39.159') then activ = true sampAddChatMessage('{FF0000}WolHelper {FFFFFF}для {00FF00}Way Of Life и After Life {01A0E9}загружен', - 1) sampAddChatMessage(teg ..'/wolhelp - команды скрипта. Версия скрипта: {d5dedd}' ..thisScript().version, - 1) sampAddChatMessage(teg ..'Если ваша статистика не была проверена автоматически введите {FF7000}/getstat', - 1) if wol.mvd then if script.find('MVDhelper Era') then script.find('MVDhelper Era'):unload() end end else thisScript():unload() end
 
-if script.find('PrisonHelper.lua') then script.find('PrisonHelper.lua'):unload() end
-if aupd == true then apdeit() end
-if not doesDirectoryExist(getWorkingDirectory() ..'/WolHelper') then
-    createDirectory(getWorkingDirectory() ..'/WolHelper')
-    local file = io.open(getWorkingDirectory() ..'/WolHelper/начало_собеса.txt', 'w+')
-    file:close()
-    local file = io.open(getWorkingDirectory() ..'/WolHelper/конец_собеса.txt', 'w+')
-    file:close()
-    local file = io.open(getWorkingDirectory() ..'/WolHelper/первая_напоминалка_собеса.txt', 'w+')
-    file:close()
-    local file = io.open(getWorkingDirectory() ..'/WolHelper/вторая_напоминалка_собеса.txt', 'w+')
-    file:close()
-end
-if not doesDirectoryExist(getWorkingDirectory() ..'/WolHelper/Binder/') then
-    createDirectory(getWorkingDirectory() ..'/WolHelper/Binder/')
-    local file = io.open(getWorkingDirectory() ..'/WolHelper/Binder/Info.txt', 'w+')
-    file:write('Введите текст\nДля установки задержки используйте wait(время в мс) в новой строчке\nПример:\n/me достал Desert Eagle\nwait(1000)\n/me снял предохранитель')
-    file:close()
-end
---imgui.Process = true
-sampRegisterChatCommand('swatgun', function(nambs) if nambs == '1' or nambs == '0' then naambs = nambs else sampAddChatMessage(teg ..'Вы введи неправильно команду. {FF7000}/swatgun [0-1]', - 1) end end)
-sampRegisterChatCommand('wolgun', wolgun)
---sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
-sampRegisterChatCommand('getjob', function() sampSendPickedUpPickup(168) end)
-sampRegisterChatCommand('getstat', function() getstat = true sampSendChat('/mm') end)
-sampRegisterChatCommand('wolhelp', function() imguifaq.v = true end)
-sampRegisterChatCommand('wolreload', function() thisScript():reload() end)
-sampRegisterChatCommand('wolmenu', function() scriptmenu.v = true end)
-sampRegisterChatCommand('woltp', function(res) if res:find('%d+') then sampSendChat('/find '..res) tpfindresult = true else tporg.v = true end end)
-sampRegisterChatCommand('woldamag', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', - 1) return else sampSendGiveDamage(id, 49, 24, 9) end end)
-sampRegisterChatCommand('wolsu', function(id) sampSendTakeDamage(id, 49, 24, 9) end)
-sampRegisterChatCommand('woldamags', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', - 1) return else lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
-sampRegisterChatCommand('woldamager', damagerblyt)
-sampRegisterChatCommand('wolpomeha', pomehaska)
-sampRegisterChatCommand('wolcarhp', wolcarhp)
-sampRegisterChatCommand('wolarmor', wolarmor)
-sampRegisterChatCommand('vig', vigovor)
-sampRegisterChatCommand('ф', function(args) if #args > 0 then sampSendChat('/a '..args) end end)
-sampRegisterChatCommand('щ', function(args) if #args > 0 then sampSendChat('/o '..args) end end)
-sampRegisterChatCommand('uninvite', uninviteska)
-sampRegisterChatCommand('wolstroy', function() sampSendChat('/members') trenirovkaimgui.v = true end)
-sampRegisterChatCommand('suninvite', function(arg) sampSendChat('/uninvite '..arg) end)
-sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
-sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
-sampRegisterChatCommand('woladmin', function() adminfrak.v = true end)
-sampRegisterChatCommand('wolstrob', function() strobes = not strobes if strobes then strobesfunc:run() end end)
-sampRegisterChatCommand('admins', function() sampSendChat('/admins') adminsimgui.v = true end)
-sampRegisterChatCommand('checktextdraw', function() for i = 0, 4000 do if sampTextdrawIsExists(i) then sampAddChatMessage(sampTextdrawGetString(i) ..i, -1) end end end)
-sampRegisterChatCommand('wolsetpostime', setpostimefunc)
+    if script.find('PrisonHelper.lua') then script.find('PrisonHelper.lua'):unload() end
+    if aupd == true then apdeit() end
+    if not doesDirectoryExist(getWorkingDirectory() ..'/WolHelper') then
+        createDirectory(getWorkingDirectory() ..'/WolHelper')
+        local file = io.open(getWorkingDirectory() ..'/WolHelper/начало_собеса.txt', 'w+')
+        file:close()
+        local file = io.open(getWorkingDirectory() ..'/WolHelper/конец_собеса.txt', 'w+')
+        file:close()
+        local file = io.open(getWorkingDirectory() ..'/WolHelper/первая_напоминалка_собеса.txt', 'w+')
+        file:close()
+        local file = io.open(getWorkingDirectory() ..'/WolHelper/вторая_напоминалка_собеса.txt', 'w+')
+        file:close()
+    end
+    if not doesDirectoryExist(getWorkingDirectory() ..'/WolHelper/Binder/') then
+        createDirectory(getWorkingDirectory() ..'/WolHelper/Binder/')
+        local file = io.open(getWorkingDirectory() ..'/WolHelper/Binder/Info.txt', 'w+')
+        file:write('Введите текст\nДля установки задержки используйте wait(время в мс) в новой строчке\nПример:\n/me достал Desert Eagle\nwait(1000)\n/me снял предохранитель')
+        file:close()
+    end
+    --imgui.Process = true
+    sampRegisterChatCommand('swatgun', function(nambs) if nambs == '1' or nambs == '0' then naambs = nambs else sampAddChatMessage(teg ..'Вы введи неправильно команду. {FF7000}/swatgun [0-1]', - 1) end end)
+    sampRegisterChatCommand('wolgun', wolgun)
+    --sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
+    sampRegisterChatCommand('getjob', function() sampSendPickedUpPickup(168) end)
+    sampRegisterChatCommand('getstat', function() getstat = true sampSendChat('/mm') end)
+    sampRegisterChatCommand('wolhelp', function() imguifaq.v = true end)
+    sampRegisterChatCommand('wolreload', function() thisScript():reload() end)
+    sampRegisterChatCommand('wolmenu', function() scriptmenu.v = true end)
+    sampRegisterChatCommand('woltp', function(res) if res:find('%d+') then sampSendChat('/find '..res) tpfindresult = true else tporg.v = true end end)
+    sampRegisterChatCommand('woldamag', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', - 1) return else sampSendGiveDamage(id, 49, 24, 9) end end)
+    sampRegisterChatCommand('wolsu', function(id) sampSendTakeDamage(id, 49, 24, 9) end)
+    sampRegisterChatCommand('woldamags', function(id) if not id:find('%d+') then sampAddChatMessage(teg ..'Не правильно введён ID', - 1) return else lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(id, 49, 24, 9) wait(90) end end) end end)
+    sampRegisterChatCommand('woldamager', damagerblyt)
+    sampRegisterChatCommand('wolpomeha', pomehaska)
+    sampRegisterChatCommand('wolcarhp', wolcarhp)
+    sampRegisterChatCommand('wolarmor', wolarmor)
+    sampRegisterChatCommand('vig', vigovor)
+    sampRegisterChatCommand('ф', function(args) if #args > 0 then sampSendChat('/a '..args) end end)
+    sampRegisterChatCommand('щ', function(args) if #args > 0 then sampSendChat('/o '..args) end end)
+    sampRegisterChatCommand('uninvite', uninviteska)
+    sampRegisterChatCommand('wolstroy', function() sampSendChat('/members') trenirovkaimgui.v = true end)
+    sampRegisterChatCommand('suninvite', function(arg) sampSendChat('/uninvite '..arg) end)
+    sampRegisterChatCommand('wolleader', function() wolleader.v = true end)
+    sampRegisterChatCommand('members', function() sampSendChat('/members') findimgui.v = true end)
+    sampRegisterChatCommand('woladmin', function() adminfrak.v = true end)
+    sampRegisterChatCommand('wolstrob', function() strobes = not strobes if strobes then strobesfunc:run() end end)
+    sampRegisterChatCommand('admins', function() sampSendChat('/admins') adminsimgui.v = true end)
+    sampRegisterChatCommand('checktextdraw', function() for i = 0, 4000 do if sampTextdrawIsExists(i) then sampAddChatMessage(sampTextdrawGetString(i) ..i, - 1) end end end)
+    sampRegisterChatCommand('wolsetpostime', setpostimefunc)
 
-if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
+    if not doesFileExist('moonloader\\config\\Way_Of_Life_Helper.ini') then inicfg.save(default, 'Way_Of_Life_Helper.ini') sampAddChatMessage(teg ..'Ini файл был создан.', - 1) end
 
 
-rkeys.registerHotKey({vkeys.VK_MENU, vkeys.VK_1}, true, function() if not superkillerubiza.v then superkillerubiza.v = true end end)
-rkeys.registerHotKey({vkeys.VK_RETURN}, true, function()
-    if findimgui.v then findimgui.v = false end
-    if adminsimgui.v then adminsimgui.v = false end
-    if trenirovkaimgui.v then trenirovkaimgui.v = false end
-    if superkillerubiza.v then
-        if superkillerubizarezhim.v == 0 then
-            lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) wait(90) end end)
+    rkeys.registerHotKey({vkeys.VK_MENU, vkeys.VK_1}, true, function() if not superkillerubiza.v then superkillerubiza.v = true end end)
+    rkeys.registerHotKey({vkeys.VK_RETURN}, true, function()
+        if findimgui.v then findimgui.v = false end
+        if adminsimgui.v then adminsimgui.v = false end
+        if trenirovkaimgui.v then trenirovkaimgui.v = false end
+        if superkillerubiza.v then
+            if superkillerubizarezhim.v == 0 then
+                lua_thread.create(function() for i = 0, wol.damag do sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) wait(90) end end)
+            end
+            if superkillerubizarezhim.v == 1 then pomehaska(tostring(superkillerubizaid.v)) end
+            if superkillerubizarezhim.v == 2 then sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) end
         end
-        if superkillerubizarezhim.v == 1 then pomehaska(tostring(superkillerubizaid.v)) end
-        if superkillerubizarezhim.v == 2 then sampSendGiveDamage(superkillerubizaid.v, 49, 24, 9) end
-    end
-end)
+    end)
 
-imgui.Process = true
+    imgui.Process = true
 
-showCursor(false, false)
+    showCursor(false, false)
 
-if wol.timesetpos then
-    local timedata = 's'
-    local timeclock = 's'
-    lua_thread.create(function()
-        while wol.timesetpos do
-        sampTextdrawSetPos(16, wol.timeposx, wol.timeposy)
-        sampTextdrawSetPos(17, wol.timeposx - 9, wol.timeposy + 20)
-        wait(0)
-    end
-end)
+    if wol.timesetpos then
+        local timedata = 's'
+        local timeclock = 's'
+        lua_thread.create(function()
+            while wol.timesetpos do
+            sampTextdrawSetPos(16, wol.timeposx, wol.timeposy)
+            sampTextdrawSetPos(17, wol.timeposx - 9, wol.timeposy + 20)
+            wait(0)
+        end
+    end)
 end
 
 if wol.offpayday then lua_thread.create(offpaydayfunc) end
 
 while true do
---imgui.Process = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v
--- LOAD PARAMS
-wol = ini.WOL
-aupd = wol.aupd
-adownload = wol.adownload
-org = wol.org
-hide = wol.hide
-autogun = wol.autogun
-mvd = wol.mvd
-gun = wol.gun
-wolpass = wol.wolpass
-wolalogin = wol.wolalogin
-wait(0)
+    --imgui.Process = scriptmenu.v or imguifaq.v or tporg.v or picupsimgui.v or superkillerubiza.v or findimgui.v
+    -- LOAD PARAMS
+    wol = ini.WOL
+    aupd = wol.aupd
+    adownload = wol.adownload
+    org = wol.org
+    hide = wol.hide
+    autogun = wol.autogun
+    mvd = wol.mvd
+    gun = wol.gun
+    wolpass = wol.wolpass
+    wolalogin = wol.wolalogin
+    wait(0)
 end
 end
 
 function checkmenu()
-local my_dialoges = {
-{
-    title = string.format('My stat: %s', stat and 'Вкл' or 'Выкл')
-}
-}
+    local my_dialoges = {
+        {
+            title = string.format('My stat: %s', stat and 'Вкл' or 'Выкл')
+        }
+    }
 end
 
 function menu()
-checkmenu()
-submenus_show(my_dialoges, 'Ebat', 'Ok', 'Ne ok!', 'Nozad')
-if stat == false then stat = true else stat = false end
+    checkmenu()
+    submenus_show(my_dialoges, 'Ebat', 'Ok', 'Ne ok!', 'Nozad')
+    if stat == false then stat = true else stat = false end
 end
 
 
 function pickupid(model)
-local poolPtr = sampGetPickupPoolPtr()
-local ptwo = readMemory(poolPtr, 4, 0)
-if ptwo > 0 then
-ptwo = poolPtr + 0x4
-local pthree = poolPtr + 0xF004
-for id = 1, 4096 do
-    local pfive = readMemory(ptwo + id * 4, 4, false)
-    if pfive < 0 or pfive > 0 then
-        pfive = readMemory(pthree + id * 20, 4, false)
-        if pfive == 353 then
-            return id
+    local poolPtr = sampGetPickupPoolPtr()
+    local ptwo = readMemory(poolPtr, 4, 0)
+    if ptwo > 0 then
+        ptwo = poolPtr + 0x4
+        local pthree = poolPtr + 0xF004
+        for id = 1, 4096 do
+            local pfive = readMemory(ptwo + id * 4, 4, false)
+            if pfive < 0 or pfive > 0 then
+                pfive = readMemory(pthree + id * 20, 4, false)
+                if pfive == 353 then
+                    return id
+                end
+            end
         end
     end
-end
-end
 end
 
 
 
 function getorg(orges)
-if orges:find('LSPD') then return 1 end
-if orges:find('FBI') then return 2 end
-if orges:find('S.W.A.T') then return 3 end
-if orges:find('ВВС') then return 4 end
-if orges:find('Army LV') then return 5 end
-if orges:find('Army SF') then return 6 end
-if orges:find('Мэрия') then return 7 end
-if orges:find('Правительство') then return 8 end
-if orges:find('Hitmans') then return 9 end
-if orges:find('Ballas Gang') then return 10 end
-if orges:find('Vagos Gang') then return 11 end
-if orges:find('Grove Street Gang') then return 12 end
-if orges:find('Aztecas Gang') then return 13 end
-if orges:find('Rifa Gang') then return 14 end
+    if orges:find('LSPD') then return 1 end
+    if orges:find('FBI') then return 2 end
+    if orges:find('S.W.A.T') then return 3 end
+    if orges:find('ВВС') then return 4 end
+    if orges:find('Army LV') then return 5 end
+    if orges:find('Army SF') then return 6 end
+    if orges:find('Мэрия') then return 7 end
+    if orges:find('Правительство') then return 8 end
+    if orges:find('Hitmans') then return 9 end
+    if orges:find('Ballas Gang') then return 10 end
+    if orges:find('Vagos Gang') then return 11 end
+    if orges:find('Grove Street Gang') then return 12 end
+    if orges:find('Aztecas Gang') then return 13 end
+    if orges:find('Rifa Gang') then return 14 end
 end
 
 
 function SE.onServerMessage(color, text)
-if text:find('Чтобы войти в админку введите /alogin') and wol.woladminlogin then adminloginfunc() end
-if text:find('.+Вы успешно авторизовались!') then getstat = true sampSendChat('/mm') end
-if text:find('Выдано:   Дубинка') and swatgun then return false end
---if re.match(text, 's <- {.+} / . s') then sampAddChatMessage(text, -1) end
-if text:find('Члены организации Online') or text:find('Члены организации %{FFFFFF%}№.+ %{059BD3%}Online:') then findshowtable, vstroy, nevstroy, ryadom = {}, {}, {}, {} findshow = true return false end
-if findshow and text:find('ранг') then
-local id, nick, rang = text:match('%[(%d+)%] (%a+_%a+) ранг: (.+) ')
-if id == nil or rang == nil then sampAddChatMessage(teg ..'Произошла ошибка. Ник: '..nick, - 1) return end
-local name = nick ..' ['..id..']' findshowtable[name] = rang
-local result, ped = sampGetCharHandleBySampPlayerId(id)
-local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
-if doesCharExist(ped) then
-    local x, y, z = getCharCoordinates(ped)
-    local mx, my, mz = getCharCoordinates(PLAYER_PED)
-    local dist = getDistanceBetweenCoords3d(mx, my, mz, x, y, z)
+    if text:find('Чтобы войти в админку введите /alogin') and wol.woladminlogin then adminloginfunc() end
+    if text:find('.+Вы успешно авторизовались!') then getstat = true sampSendChat('/mm') end
+    if text:find('Выдано:   Дубинка') and swatgun then return false end
+    --if re.match(text, 's <- {.+} / . s') then sampAddChatMessage(text, -1) end
+    if text:find('Члены организации Online') or text:find('Члены организации %{FFFFFF%}№.+ %{059BD3%}Online:') then findshowtable, vstroy, nevstroy, ryadom = {}, {}, {}, {} findshow = true return false end
+    if findshow and text:find('ранг') then
+        local id, nick, rang = text:match('%[(%d+)%] (%a+_%a+) ранг: (.+) ')
+        if id == nil or rang == nil then sampAddChatMessage(teg ..'Произошла ошибка. Ник: '..nick, - 1) return end
+        local name = nick ..' ['..id..']' findshowtable[name] = rang
+        local result, ped = sampGetCharHandleBySampPlayerId(id)
+        local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
+        if doesCharExist(ped) then
+            local x, y, z = getCharCoordinates(ped)
+            local mx, my, mz = getCharCoordinates(PLAYER_PED)
+            local dist = getDistanceBetweenCoords3d(mx, my, mz, x, y, z)
 
-    if dist <= 25 then
-        vstroy[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
-    else
-        ryadom[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
+            if dist <= 25 then
+                vstroy[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
+            else
+                ryadom[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
+            end
+        else
+            if tonumber(id) == myid then nevstroy[name ..' <<<'] = rang return false end
+            nevstroy[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
+        end
+        return false
     end
-else
-    if tonumber(id) == myid then nevstroy[name ..' <<<'] = rang return false end
-    nevstroy[name ..(sampIsPlayerPaused(id) and ' [AFK]' or '')] = rang
-end
-return false
-end
-if text:find('Всего: %d+ человек') then
-findkolvo = text:match('Всего: (%d+) человек')
-findshow = false
-return false
-end
+    if text:find('Всего: %d+ человек') then
+        findkolvo = text:match('Всего: (%d+) человек')
+        findshow = false
+        return false
+    end
 end
 
 function SE.onShowDialog(dialogId, style, title, button1, button2, text)
-if title:find('Лицензионное соглашение') and wol.woladminlogin then sampSendDialogResponse(dialogId, 1, - 1, - 1) return false end
-if wolalogin == true then
-if title == '{AEFFFF}Авторизация' then
-    if text:find('.+Попыток: %d+ из %d+.+') then
-        sampAddChatMessage(teg ..'Вы ввели неправильно пароль. Для смены пароля введите /wolpass', - 1)
-    else
-        sampSendDialogResponse(dialogId, 1, - 1, wolpass)
+    if title:find('Лицензионное соглашение') and wol.woladminlogin then sampSendDialogResponse(dialogId, 1, - 1, - 1) return false end
+    if wolalogin == true then
+        if title == '{AEFFFF}Авторизация' then
+            if text:find('.+Попыток: %d+ из %d+.+') then
+                sampAddChatMessage(teg ..'Вы ввели неправильно пароль. Для смены пароля введите /wolpass', - 1)
+            else
+                sampSendDialogResponse(dialogId, 1, - 1, wolpass)
+                return false
+            end
+        end
+    end
+    if activ then
+        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№1' then sampSendDialogResponse(dialogId, 1, - 1, '2') end
+        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№2' then sampSendDialogResponse(dialogId, 1, - 1, '4') end
+        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№3' then sampSendDialogResponse(dialogId, 1, - 1, '1') end
+        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№4' then sampSendDialogResponse(dialogId, 1, - 1, '1') end
+        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№5' then sampSendDialogResponse(dialogId, 1, - 1, '3') end
+        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№6' then sampSendDialogResponse(dialogId, 1, - 1, '2') end
+        if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№7' then sampSendDialogResponse(dialogId, 1, - 1, '4') lua_thread.create(function() wait(500) getstat = true sampSendChat('/mm') end) end
+    end
+    if getstat == true then
+        if title:find('{AEFFFF}Игровой уровень: %d+ | Очки опыта: %d+ из %d+') then
+            sampSendDialogResponse(5051, 1, 0, _)
+            return false
+        end
+        if title:find('{33AA33}Статистика игрового аккаунта:{ffffff} .+') then
+            warn = text:match('.+(%d+)/.+Уровень Преступлений:.+')
+            orges = text:match('.+Организация:.+%{ffffff}(.+)Ранг:.+')
+            orgs = getorg(orges)
+            getstat = false
+            if warn ~= '0' then sampAddChatMessage(teg ..'Ваша организация: '..orges, - 1) sampAddChatMessage(teg ..'На вашем аккаунте имеется {FF7000}' ..warn ..' {FFFFFF}варн(а). Рекомендуем снять для избежания бана!', - 1) return false
+            else
+                sampAddChatMessage(teg ..'Ваш аккаунт чист. Ваша организация: '..orges ..'.', - 1)
+                return false
+            end
+        end
+    end
+    if swatgun == true then
+        if title == 'Комплекты « SWAT » San Andreas' then for i = 0, gun * 4 do sampSendDialogResponse(dialogId, tonumber(naambs), - 1, - 1) end lua_thread.create(function() wait(10000) swatgun = false end) end
+    end
+    if autogun == true and title:find('Набор.+') and dialogId == 5051 then
+        sampSendDialogResponse(dialogId, 1, 0, 1)
+        for i = 0, gun do
+            sampSendDialogResponse(dialogId, 1, 3, 1)
+            sampSendDialogResponse(dialogId, 1, 4, 1)
+            sampSendDialogResponse(dialogId, 1, 5, 1)
+            sampSendDialogResponse(dialogId, 1, 6, 1)
+        end
+    end
+    if title == '{FFFFFF}.:: Way Of Life {FFFFFF}Admins {22FF22}Online ::.' then
+        adminlist = {}
+        vsegoadm = 0
+        for line in text:gmatch("[^\r\n]+") do
+            if line:find('.+%{FFFFFF%}.+%[%d+%].+%(%d+/3%).+%[%d+/3%].+%{22FF22%}%d+') then
+                prefix, admname, admrang, adminawarn, adminowarn, adminid = line:match('(.+)%{FFFFFF%}(.+)%[(%d+)%].+%((%d+)/3%).+%[(%d+)/3%].+%{22FF22%}(%d+)')
+                --adminlist = {prefix = prefix, admname = admname}
+                table.insert(adminlist, {prefix = prefix, admname = admname, admrang = admrang, adminawarn = adminawarn, adminowarn = adminowarn, adminid = adminid})
+                vsegoadm = vsegoadm + 1
+            end
+        end
         return false
     end
-end
-end
-if activ then
-if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№1' then sampSendDialogResponse(dialogId, 1, - 1, '2') end
-if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№2' then sampSendDialogResponse(dialogId, 1, - 1, '4') end
-if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№3' then sampSendDialogResponse(dialogId, 1, - 1, '1') end
-if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№4' then sampSendDialogResponse(dialogId, 1, - 1, '1') end
-if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№5' then sampSendDialogResponse(dialogId, 1, - 1, '3') end
-if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№6' then sampSendDialogResponse(dialogId, 1, - 1, '2') end
-if title == '{FFFFFF}RolePlay Тест | Вопрос {FFC100}№7' then sampSendDialogResponse(dialogId, 1, - 1, '4') lua_thread.create(function() wait(500) getstat = true sampSendChat('/mm') end) end
-end
-if getstat == true then
-if title:find('{AEFFFF}Игровой уровень: %d+ | Очки опыта: %d+ из %d+') then
-    sampSendDialogResponse(5051, 1, 0, _)
-    return false
-end
-if title:find('{33AA33}Статистика игрового аккаунта:{ffffff} .+') then
-    warn = text:match('.+(%d+)/.+Уровень Преступлений:.+')
-    orges = text:match('.+Организация:.+%{ffffff}(.+)Ранг:.+')
-    orgs = getorg(orges)
-    getstat = false
-    if warn ~= '0' then sampAddChatMessage(teg ..'Ваша организация: '..orges, - 1) sampAddChatMessage(teg ..'На вашем аккаунте имеется {FF7000}' ..warn ..' {FFFFFF}варн(а). Рекомендуем снять для избежания бана!', - 1) return false
-    else
-        sampAddChatMessage(teg ..'Ваш аккаунт чист. Ваша организация: '..orges ..'.', - 1)
-        return false
-    end
-end
-end
-if swatgun == true then
-if title == 'Комплекты « SWAT » San Andreas' then for i = 0, gun * 4 do sampSendDialogResponse(dialogId, tonumber(naambs), - 1, - 1) end lua_thread.create(function() wait(10000) swatgun = false end) end
-end
-if autogun == true and title:find('Набор.+') and dialogId == 5051 then
-sampSendDialogResponse(dialogId, 1, 0, 1)
-for i = 0, gun do
-    sampSendDialogResponse(dialogId, 1, 3, 1)
-    sampSendDialogResponse(dialogId, 1, 4, 1)
-    sampSendDialogResponse(dialogId, 1, 5, 1)
-    sampSendDialogResponse(dialogId, 1, 6, 1)
-end
-end
-if title == '{FFFFFF}.:: Way Of Life {FFFFFF}Admins {22FF22}Online ::.' then
-adminlist = {}
-vsegoadm = 0
-for line in text:gmatch("[^\r\n]+") do
-    if line:find('.+%{FFFFFF%}.+%[%d+%].+%(%d+/3%).+%[%d+/3%].+%{22FF22%}%d+') then
-        prefix, admname, admrang, adminawarn, adminowarn, adminid = line:match('(.+)%{FFFFFF%}(.+)%[(%d+)%].+%((%d+)/3%).+%[(%d+)/3%].+%{22FF22%}(%d+)')
-        --adminlist = {prefix = prefix, admname = admname}
-        table.insert(adminlist, {prefix = prefix, admname = admname, admrang = admrang, adminawarn = adminawarn, adminowarn = adminowarn, adminid = adminid})
-        vsegoadm = vsegoadm + 1
-    end
-end
-return false
-end
 end
 
 
 
 function wolgun()
-lua_thread.create(function()
-if orgs == nil then getstat = true sampSendChat('/mm') end
-while orgs == nil do wait(0) end
-if orgs < 9 and orgs ~= 3 then
-    sampSendPickedUpPickup(getgunses[orgs])
-elseif orgs == 9 then
-    hitmangun()
-elseif orgs == 3 then
-    swatgun = true sampSendPickedUpPickup(getgunses[orgs])
-elseif orgs >= 10 then
-    ganggun(orgs)
-end
-end)
+    lua_thread.create(function()
+        if orgs == nil then getstat = true sampSendChat('/mm') end
+        while orgs == nil do wait(0) end
+        if orgs < 9 and orgs ~= 3 then
+            sampSendPickedUpPickup(getgunses[orgs])
+        elseif orgs == 9 then
+            hitmangun()
+        elseif orgs == 3 then
+            swatgun = true sampSendPickedUpPickup(getgunses[orgs])
+        elseif orgs >= 10 then
+            ganggun(orgs)
+        end
+    end)
 end
 
 function damagerblyt(nid)
-local nekill = nil
-if nid:find('%d+') then nekill = tonumber(nid) end
-lua_thread.create(function()
-local peds = getAllChars()
-for i = 0, #peds do
-    local _, id = sampGetPlayerIdByCharHandle(peds[i])
-    local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
-    local result = sampIsPlayerPaused(id)
-    if nekill == nil then nekill = myid end
-    if not result and id ~= myid and id ~= nekill then
-        for z = 0, wol.damag do
-            sampSendGiveDamage(id, 49, 24, 9)
-            wait(90)
+    local nekill = nil
+    if nid:find('%d+') then nekill = tonumber(nid) end
+    lua_thread.create(function()
+        local peds = getAllChars()
+        for i = 0, #peds do
+            local _, id = sampGetPlayerIdByCharHandle(peds[i])
+            local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
+            local result = sampIsPlayerPaused(id)
+            if nekill == nil then nekill = myid end
+            if not result and id ~= myid and id ~= nekill then
+                for z = 0, wol.damag do
+                    sampSendGiveDamage(id, 49, 24, 9)
+                    wait(90)
+                end
+                wait(200)
+            end
         end
-        wait(200)
-    end
-end
-notf.addNotification('Дамагер выключен', 5, 2)
-end)
+        notf.addNotification('Дамагер выключен', 5, 2)
+    end)
 end
 
 function pomehaska(id)
-if not id:find('%d+') then
-notf.addNotification('WolHelper\n\nОшибка. Используйте /wolpomeha ID', 5, 3)
-return
-end
---sampAddChatMessage(teg ..'Не правильно введён ID', -1) return end
-local name = sampGetPlayerNickname(id)
-if dmg ~= true then
-lua_thread.create(function()
-    dmg = true
-    --sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] включён', - 1)
-    notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] включён', 5, 1)
-    local con = sampIsPlayerConnected(id)
-    while dmg and con do
-        con = sampIsPlayerConnected(id)
-        sampSendGiveDamage(id, 49, 24, 9)
-        wait(0)
+    if not id:find('%d+') then
+        notf.addNotification('WolHelper\n\nОшибка. Используйте /wolpomeha ID', 5, 3)
+        return
     end
-    dmg = false
-    if not con then
-        --sampAddChatMessage(teg ..'Убиватор выключен. Жертва оффнулась', -1)
-        notf.addNotification('WolHelper\n\nУбиватор выключен. Жертва оффнулась', 5, 1)
+    --sampAddChatMessage(teg ..'Не правильно введён ID', -1) return end
+    local name = sampGetPlayerNickname(id)
+    if dmg ~= true then
+        lua_thread.create(function()
+            dmg = true
+            --sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] включён', - 1)
+            notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] включён', 5, 1)
+            local con = sampIsPlayerConnected(id)
+            while dmg and con do
+                con = sampIsPlayerConnected(id)
+                sampSendGiveDamage(id, 49, 24, 9)
+                wait(0)
+            end
+            dmg = false
+            if not con then
+                --sampAddChatMessage(teg ..'Убиватор выключен. Жертва оффнулась', -1)
+                notf.addNotification('WolHelper\n\nУбиватор выключен. Жертва оффнулась', 5, 1)
+            end
+        end)
+    else
+        dmg = false
+        --sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] выключен', - 1)
+        notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] выключен', 5, 1)
     end
-end)
-else
-dmg = false
---sampAddChatMessage(teg ..'Убиватор на ' ..name ..'['..id..'] выключен', - 1)
-notf.addNotification('WolHelper\n\nУбиватор на ' ..name ..'['..id..'] выключен', 5, 1)
-end
 end
 
 
 --ОБНОВА
 
 function apdeit()
-async_http_request('GET', 'https://raw.githubusercontent.com/SaburoShimizu/WOL/master/WOLVER', nil --[[параметры запроса]],
-function(resp) -- вызовется при успешном выполнении и получении ответа
-    local suk = resp.text
-    newvers = suk:match('Version = (.+), URL.+') if newvers > thisScript().version then sampAddChatMessage(teg ..'Обнаружено обновление до v.{FF0000}'..newvers ..'{01A0E9}. Для обновления используйте /wolmenu', - 1) elseif newvers == thisScript().version then sampAddChatMessage(teg..'У вас актуальная версия скрипта.', - 1) elseif newvers < thisScript().version then sampAddChatMessage(teg..'У вас тестовая версия скрипта.', - 1) end
-    print('Проверка обновления')
-end,
-function(err) -- вызовется при ошибке, err - текст ошибки. эту функцию можно не указывать
-    print(err)
-    sampAddChatMessage(teg ..'Ошибка поиска версии. Попробуйте позже.', - 1)
-end)
+    async_http_request('GET', 'https://raw.githubusercontent.com/SaburoShimizu/WOL/master/WOLVER', nil --[[параметры запроса]],
+        function(resp) -- вызовется при успешном выполнении и получении ответа
+            local suk = resp.text
+            newvers = suk:match('Version = (.+), URL.+') if newvers > thisScript().version then sampAddChatMessage(teg ..'Обнаружено обновление до v.{FF0000}'..newvers ..'{01A0E9}. Для обновления используйте /wolmenu', - 1) elseif newvers == thisScript().version then sampAddChatMessage(teg..'У вас актуальная версия скрипта.', - 1) elseif newvers < thisScript().version then sampAddChatMessage(teg..'У вас тестовая версия скрипта.', - 1) end
+            print('Проверка обновления')
+        end,
+        function(err) -- вызовется при ошибке, err - текст ошибки. эту функцию можно не указывать
+            print(err)
+            sampAddChatMessage(teg ..'Ошибка поиска версии. Попробуйте позже.', - 1)
+    end)
 end
 
 
@@ -826,8 +826,8 @@ function imgui.OnDrawFrame()
         end
         if imgui.CollapsingHeader(u8'ТП в организации') then
             if imgui.MenuItem(u8'LSPD') then sampSendPickedUpPickup(103) tporg.v = false end
-            if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(198) tporg.v = false end
-            if imgui.MenuItem(u8'Мэрия (сзади)') then sampSendPickedUpPickup(200) tporg.v = false end
+            if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(212) tporg.v = false end
+            if imgui.MenuItem(u8'Мэрия (сзади)') then sampSendPickedUpPickup(214) tporg.v = false end
             if imgui.MenuItem(u8'Банк') then sampSendPickedUpPickup(29) tporg.v = false end
             if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(212) tporg.v = false end
             if imgui.MenuItem(u8'S.W.A.T') then sampSendPickedUpPickup(24) tporg.v = false end
@@ -846,8 +846,8 @@ function imgui.OnDrawFrame()
         end
         if imgui.CollapsingHeader(u8'ТП из организации') then
             if imgui.MenuItem(u8'LSPD') then sampSendPickedUpPickup(104) tporg.v = false end
-            if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(201) tporg.v = false end
-            if imgui.MenuItem(u8'Мэрия (сзади)') then sampSendPickedUpPickup(199) tporg.v = false end
+            if imgui.MenuItem(u8'Мэрия') then sampSendPickedUpPickup(215) tporg.v = false end
+            if imgui.MenuItem(u8'Мэрия (сзади)') then sampSendPickedUpPickup(213) tporg.v = false end
             if imgui.MenuItem(u8'Банк') then sampSendPickedUpPickup(30) tporg.v = false end
             if imgui.MenuItem(u8'Правительство') then sampSendPickedUpPickup(213) tporg.v = false end
             if imgui.MenuItem(u8'S.W.A.T') then sampSendPickedUpPickup(25) tporg.v = false end
@@ -1330,31 +1330,33 @@ end)
 end
 
 function adminloginfunc()
-local pass = stringToArray(''..wol.woladminpass)
-lua_thread.create(function()
-	wait(500)
-    for k, v in pairs(pass) do
-    sampSendClickTextdraw(alogintextdraw[tonumber(v)])
-    wait(300)
-end
-wait(700)
-    sampSendClickTextdraw(63)
-end)
+    local pass = stringToArray(''..wol.woladminpass)
+    lua_thread.create(function()
+        wait(500)
+        for k, v in pairs(pass) do
+            sampSendClickTextdraw(alogintextdraw[tonumber(v)])
+            wait(300)
+        end
+        wait(700)
+        sampSendClickTextdraw(63)
+    end)
 end
 
 function offpaydayfunc()
     while wol.offpayday do
         wait(0)
         local date = os.date('*t')
-        if date.min == 59 and date.sec == 10 then sampDisconnectWithReason(true) wait(1000) end
-        if date.min == 1 and date.sec == 0 then sampConnectToServer('176.32.36.103', 7777) wait(1000) end
+        if date.min == 59 and date.sec == 30 then
+			notf.addNotification('Сработал офф от Pay Day\nЧерез 2 минуты вы будете загружены\nНе вставайте в АФК.',10, 2)
+			sampDisconnectWithReason(true)
+			wait(1000)
+		end
+        if date.min == 1 and date.sec == 0 then
+			sampConnectToServer('176.32.36.103', 7777)
+			wait(1000)
+		end
     end
 end
-
-function SE.onShowTextdraw(id, data)
-	if id == 16 then data.position.x = 200 return {id, data} end
-end
-
 
 
 
@@ -1481,11 +1483,11 @@ end
 
 
 function stringToArray(str)
-local t = {}
-for i = 1, #str do
-t[i] = str:sub(i, i)
-end
-return t
+    local t = {}
+    for i = 1, #str do
+        t[i] = str:sub(i, i)
+    end
+    return t
 end
 
 local russian_characters = {
@@ -1498,14 +1500,14 @@ if strlen == 0 then return s end
 s = s:lower()
 local output = ''
 for i = 1, strlen do
-local ch = s:byte(i)
-if ch >= 192 and ch <= 223 then -- upper russian characters
-    output = output .. russian_characters[ch + 32]
-elseif ch == 168 then -- Ё
-    output = output .. russian_characters[184]
-else
-    output = output .. string.char(ch)
-end
+    local ch = s:byte(i)
+    if ch >= 192 and ch <= 223 then -- upper russian characters
+        output = output .. russian_characters[ch + 32]
+    elseif ch == 168 then -- Ё
+        output = output .. russian_characters[184]
+    else
+        output = output .. string.char(ch)
+    end
 end
 return output
 end
@@ -1516,14 +1518,14 @@ if strlen == 0 then return s end
 s = s:upper()
 local output = ''
 for i = 1, strlen do
-local ch = s:byte(i)
-if ch >= 224 and ch <= 255 then -- lower russian characters
-    output = output .. russian_characters[ch - 32]
-elseif ch == 184 then -- ё
-    output = output .. russian_characters[168]
-else
-    output = output .. string.char(ch)
-end
+    local ch = s:byte(i)
+    if ch >= 224 and ch <= 255 then -- lower russian characters
+        output = output .. russian_characters[ch - 32]
+    elseif ch == 184 then -- ё
+        output = output .. russian_characters[168]
+    else
+        output = output .. string.char(ch)
+    end
 end
 return output
 end
@@ -1532,24 +1534,24 @@ end
 
 function onScriptTerminate(script, quitGame)
 if script == idnotf then
-lua_thread.create(function() wait(10) notf = import 'imgui_notf.lua' notf.addNotification('WolHelper успешно загружен\n\nВерсия скрипта: '..thisScript().version, 5, 1) end)
+    lua_thread.create(function() wait(10) notf = import 'imgui_notf.lua' notf.addNotification('WolHelper успешно загружен\n\nВерсия скрипта: '..thisScript().version, 5, 1) end)
 end
 if script == thisScript() then
-sampAddChatMessage(teg ..'Скрипт крашнуло. Перезагружен автоматически', - 1)
-thisScript():reload()
+    sampAddChatMessage(teg ..'Скрипт крашнуло. Перезагружен автоматически', - 1)
+    thisScript():reload()
 end
 end
 
 function inFileRead(read_patch)
 for line in io.lines(getWorkingDirectory()..'/WolHelper/'..read_patch) do
-sampSendChat(line)
-wait(1000)
+    sampSendChat(line)
+    wait(1000)
 end
 end
 
 function inFileReadProsmotr(read_patch)
 for line in io.lines(getWorkingDirectory()..'/WolHelper/'..read_patch) do
-imgui.Text(u8(line))
+    imgui.Text(u8(line))
 end
 end
 
@@ -1557,7 +1559,7 @@ function ShowHelpMarker(text)
 imgui.SameLine()
 imgui.TextDisabled("(?)")
 if (imgui.IsItemHovered()) then
-imgui.SetTooltip(u8(text))
+    imgui.SetTooltip(u8(text))
 end
 end
 
@@ -1574,52 +1576,52 @@ local colors = style.Colors
 local ImVec4 = imgui.ImVec4
 
 local explode_argb = function(argb)
-local a = bit.band(bit.rshift(argb, 24), 0xFF)
-local r = bit.band(bit.rshift(argb, 16), 0xFF)
-local g = bit.band(bit.rshift(argb, 8), 0xFF)
-local b = bit.band(argb, 0xFF)
-return a, r, g, b
+    local a = bit.band(bit.rshift(argb, 24), 0xFF)
+    local r = bit.band(bit.rshift(argb, 16), 0xFF)
+    local g = bit.band(bit.rshift(argb, 8), 0xFF)
+    local b = bit.band(argb, 0xFF)
+    return a, r, g, b
 end
 
 local getcolor = function(color)
-if color:sub(1, 6):upper() == 'SSSSSS' then
-    local r, g, b = colors[1].x, colors[1].y, colors[1].z
-    local a = tonumber(color:sub(7, 8), 16) or colors[1].w * 255
-    return ImVec4(r, g, b, a / 255)
-end
-local color = type(color) == 'string' and tonumber(color, 16) or color
-if type(color) ~= 'number' then return end
-local r, g, b, a = explode_argb(color)
-return imgui.ImColor(r, g, b, a):GetVec4()
+    if color:sub(1, 6):upper() == 'SSSSSS' then
+        local r, g, b = colors[1].x, colors[1].y, colors[1].z
+        local a = tonumber(color:sub(7, 8), 16) or colors[1].w * 255
+        return ImVec4(r, g, b, a / 255)
+    end
+    local color = type(color) == 'string' and tonumber(color, 16) or color
+    if type(color) ~= 'number' then return end
+    local r, g, b, a = explode_argb(color)
+    return imgui.ImColor(r, g, b, a):GetVec4()
 end
 
 local render_text = function(text_)
-for w in text_:gmatch('[^\r\n]+') do
-    local textsize = w:gsub('{.-}', '')
-    local text_width = imgui.CalcTextSize(u8(textsize))
-    imgui.SetCursorPosX( width / 2 - text_width .x / 2 )
-    local text, colors_, m = {}, {}, 1
-    w = w:gsub('{(......)}', '{%1FF}')
-    while w:find('{........}') do
-        local n, k = w:find('{........}')
-        local color = getcolor(w:sub(n + 1, k - 1))
-        if color then
-            text[#text], text[#text + 1] = w:sub(m, n - 1), w:sub(k + 1, #w)
-            colors_[#colors_ + 1] = color
-            m = n
+    for w in text_:gmatch('[^\r\n]+') do
+        local textsize = w:gsub('{.-}', '')
+        local text_width = imgui.CalcTextSize(u8(textsize))
+        imgui.SetCursorPosX( width / 2 - text_width .x / 2 )
+        local text, colors_, m = {}, {}, 1
+        w = w:gsub('{(......)}', '{%1FF}')
+        while w:find('{........}') do
+            local n, k = w:find('{........}')
+            local color = getcolor(w:sub(n + 1, k - 1))
+            if color then
+                text[#text], text[#text + 1] = w:sub(m, n - 1), w:sub(k + 1, #w)
+                colors_[#colors_ + 1] = color
+                m = n
+            end
+            w = w:sub(1, n - 1) .. w:sub(k + 1, #w)
         end
-        w = w:sub(1, n - 1) .. w:sub(k + 1, #w)
-    end
-    if text[0] then
-        for i = 0, #text do
-            imgui.TextColored(colors_[i] or colors[1], u8(text[i]))
-            imgui.SameLine(nil, 0)
+        if text[0] then
+            for i = 0, #text do
+                imgui.TextColored(colors_[i] or colors[1], u8(text[i]))
+                imgui.SameLine(nil, 0)
+            end
+            imgui.NewLine()
+        else
+            imgui.Text(u8(w))
         end
-        imgui.NewLine()
-    else
-        imgui.Text(u8(w))
     end
-end
 end
 render_text(text)
 end
@@ -1628,31 +1630,31 @@ end
 
 function async_http_request(method, url, args, resolve, reject)
 local request_lane = lanes.gen('*', {package = {path = package.path, cpath = package.cpath}}, function()
-local requests = require 'requests'
-local ok, result = pcall(requests.request, method, url, args)
-if ok then
-    result.json, result.xml = nil, nil -- cannot be passed through a lane
-    return true, result
-else
-    return false, result -- return error
-end
+    local requests = require 'requests'
+    local ok, result = pcall(requests.request, method, url, args)
+    if ok then
+        result.json, result.xml = nil, nil -- cannot be passed through a lane
+        return true, result
+    else
+        return false, result -- return error
+    end
 end)
 if not reject then reject = function() end end
 lua_thread.create(function()
-local lh = request_lane()
-while true do
-    local status = lh.status
-    if status == 'done' then
-        local ok, result = lh[1], lh[2]
-        if ok then resolve(result) else reject(result) end
-        return
-    elseif status == 'error' then
-        return reject(lh[1])
-    elseif status == 'killed' or status == 'cancelled' then
-        return reject(status)
+    local lh = request_lane()
+    while true do
+        local status = lh.status
+        if status == 'done' then
+            local ok, result = lh[1], lh[2]
+            if ok then resolve(result) else reject(result) end
+            return
+        elseif status == 'error' then
+            return reject(lh[1])
+        elseif status == 'killed' or status == 'cancelled' then
+            return reject(status)
+        end
+        wait(0)
     end
-    wait(0)
-end
 end)
 end
 
@@ -1662,31 +1664,31 @@ local colors = style.Colors
 local clr = imgui.Col
 
 local function color_imvec4(color)
-if color:upper() == 'SSSSSS' then return colors[clr.Text] end
-local color = type(color) == 'number' and ('%X'):format(color):upper() or color:upper()
-local rgb = {}
-for i = 1, #color / 2 do rgb[#rgb + 1] = tonumber(color:sub(2 * i - 1, 2 * i), 16) end
-return imgui.ImVec4(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, rgb[4] and rgb[4] / 255 or colors[clr.Text].w)
+    if color:upper() == 'SSSSSS' then return colors[clr.Text] end
+    local color = type(color) == 'number' and ('%X'):format(color):upper() or color:upper()
+    local rgb = {}
+    for i = 1, #color / 2 do rgb[#rgb + 1] = tonumber(color:sub(2 * i - 1, 2 * i), 16) end
+    return imgui.ImVec4(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, rgb[4] and rgb[4] / 255 or colors[clr.Text].w)
 end
 
 local function render_text(string)
-local text, color = {}, {}
-local m = 1
-while string:find('{......}') do
-    local n, k = string:find('{......}')
-    text[#text], text[#text + 1] = string:sub(m, n - 1), string:sub(k + 1, #string)
-    color[#color + 1] = color_imvec4(string:sub(n + 1, k - 1))
-    local t1, t2 = string:sub(1, n - 1), string:sub(k + 1, #string)
-    string = t1..t2
-    m = k - 7
-end
-if text[0] then
-    for i, _ in ipairs(text) do
-        imgui.TextColored(color[i] or colors[clr.Text], u8(text[i]))
-        imgui.SameLine(nil, 0)
+    local text, color = {}, {}
+    local m = 1
+    while string:find('{......}') do
+        local n, k = string:find('{......}')
+        text[#text], text[#text + 1] = string:sub(m, n - 1), string:sub(k + 1, #string)
+        color[#color + 1] = color_imvec4(string:sub(n + 1, k - 1))
+        local t1, t2 = string:sub(1, n - 1), string:sub(k + 1, #string)
+        string = t1..t2
+        m = k - 7
     end
-    imgui.NewLine()
-else imgui.Text(u8(string)) end
+    if text[0] then
+        for i, _ in ipairs(text) do
+            imgui.TextColored(color[i] or colors[clr.Text], u8(text[i]))
+            imgui.SameLine(nil, 0)
+        end
+        imgui.NewLine()
+    else imgui.Text(u8(string)) end
 end
 
 render_text(string)
